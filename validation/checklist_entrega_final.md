@@ -72,3 +72,22 @@
 - [x] Incluye modo demo.
 - [x] Incluye log compacto.
 - [x] Puede usarse durante la grabacion.
+
+## Evidencia multimedia
+
+- [x] Se creo `assets/images/conexiones/`.
+- [x] Se creo `assets/images/montaje/`.
+- [x] Se creo `assets/images/pruebas/`.
+- [x] Se creo `assets/images/panel/`.
+- [x] Se creo `assets/images/kicad/`.
+- [x] Se creo `assets/videos/pruebas/`.
+- [x] Se creo `assets/videos/demo_final/`.
+- [x] Las fotos del prototipo fueron renombradas sin espacios ni acentos.
+- [x] Los videos del prototipo fueron renombrados sin espacios ni acentos.
+- [x] La evidencia fue copiada a `report/assets/`.
+- [x] La evidencia fue copiada a `dist/entrega_robot_minisumo/assets/`.
+- [x] Se documento `docs/inventario_multimedia.md`.
+- [x] Se documento `docs/evidencia_multimedia.md`.
+- [x] Se documento `validation/evidencia_funcionamiento.md`.
+- [x] Se revisaron tamanos de video.
+- [x] Se documento publicacion GitHub sin Git LFS en `docs/github_publicacion.md`.

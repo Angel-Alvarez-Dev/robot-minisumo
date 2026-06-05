@@ -35,3 +35,14 @@ Fecha: 2026-06-05
 - Version final confirmada por Serial: `1.0.0-funcional`.
 - Panel compacto probado en navegador integrado con modo demo y sin errores de consola.
 - Web Serial fue implementado para lectura de telemetria y envio de comandos `CMD:*`; no se declaro prueba fisica real porque no se conecto Arduino desde el navegador durante esta validacion.
+
+## Pruebas de evidencia multimedia
+
+| Prueba | Resultado esperado | Resultado observado | Estado |
+| --- | --- | --- | --- |
+| Inventario multimedia | Debe listar origen, nombre final y uso | `docs/inventario_multimedia.md` creado con imagenes, videos, tamanos y duraciones | Aprobado |
+| Estructura de assets | Debe incluir imagenes y videos separados por categoria | Carpetas `assets/images/*` y `assets/videos/*` creadas | Aprobado |
+| Copia a reporte | El reporte debe tener imagenes locales | Fotos, diagrama y captura del panel copiadas a `report/assets/` | Aprobado |
+| Copia a entrega | `dist/entrega_robot_minisumo/assets/` debe incluir evidencia final | Imagenes y videos copiados a `dist/entrega_robot_minisumo/assets/` | Aprobado |
+| Tamanos de video | Ningun video debe ser demasiado pesado para GitHub | Video mayor: 3.39 MB; no requiere Git LFS | Aprobado |
+| Captura del panel | Debe existir evidencia visual del panel | Captura 1366x768 creada en `assets/images/panel/` | Aprobado |

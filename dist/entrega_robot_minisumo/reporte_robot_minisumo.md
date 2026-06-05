@@ -26,10 +26,11 @@
 14. Diagramas de flujo.
 15. Simulacion y validacion.
 16. Pruebas realizadas.
-17. Resultados.
-18. Conclusiones.
-19. Referencias.
-20. Anexos.
+17. Evidencia del prototipo funcional.
+18. Resultados.
+19. Conclusiones.
+20. Referencias.
+21. Anexos.
 
 ## 3. Introduccion
 
@@ -166,7 +167,37 @@ Ver `simulation/casos_prueba.md`, `simulation/validacion_logica.md` y `validatio
 | Panel web compacto | Mostrar estado general, procesos, componentes, pruebas y eventos en una pantalla | Panel compacto actualizado con modo demo, pruebas rapidas y Web Serial opcional | Aprobado |
 | Robot fisico | Prototipo opera con sensores y actuadores finales | Estado reportado por usuario: robot fisico funcional | Aprobado |
 
-## 19. Resultados
+## 19. Evidencia del prototipo funcional
+
+La evidencia multimedia del prototipo funcional se integro en `assets/` y se documento en `docs/evidencia_multimedia.md`, `docs/inventario_multimedia.md` y `validation/evidencia_funcionamiento.md`.
+
+Evidencia visual incluida:
+
+| Evidencia | Archivo | Utilidad |
+| --- | --- | --- |
+| Diagrama final de conexiones | `assets/robot_minisumo_conexiones_diagrama_final_01.png` | Explica el pinout real usado en el robot. |
+| Fotografia frontal | `assets/robot_minisumo_montaje_frontal_hcsr04_01.jpg` | Muestra el HC-SR04 al frente del robot. |
+| Fotografia posterior/electronica | `assets/robot_minisumo_montaje_posterior_electronica_01.jpg` | Muestra Arduino Nano, shield, buzzer y cableado. |
+| Fotografia de pruebas | `assets/robot_minisumo_pruebas_alimentacion_sensores_01.jpg` | Muestra alimentacion y sensores activos. |
+| Captura del panel web | `assets/robot_minisumo_panel_monitoreo_desktop_01.png` | Muestra el panel minimalista usado durante la grabacion. |
+
+![Montaje frontal del prototipo](assets/robot_minisumo_montaje_frontal_hcsr04_01.jpg)
+
+![Panel web de monitoreo](assets/robot_minisumo_panel_monitoreo_desktop_01.png)
+
+Evidencia en video incluida:
+
+| Video | Duracion | Uso |
+| --- | --- | --- |
+| `assets/videos/pruebas/robot_minisumo_pruebas_buzzer_arranque_01.mp4` | 00:00:02 | Buzzer / arranque. |
+| `assets/videos/pruebas/robot_minisumo_pruebas_movimiento_servos_01.mp4` | 00:00:09 | Movimiento de servos. |
+| `assets/videos/pruebas/robot_minisumo_pruebas_sensores_linea_01.mp4` | 00:00:06 | Sensores TCRT5000. |
+| `assets/videos/pruebas/robot_minisumo_pruebas_ultrasonico_busqueda_01.mp4` | 00:00:09 | Busqueda / HC-SR04. |
+| `assets/videos/demo_final/robot_minisumo_demo_funcionamiento_final_01.mp4` | 00:00:15 | Demostracion final del robot funcional. |
+
+Esta evidencia permite explicar durante el video final que componentes estan montados, que pruebas se realizaron y como el panel acompana la demostracion en tiempo real.
+
+## 20. Resultados
 
 El prototipo fisico quedo funcional. Se confirmaron buzzer, HC-SR04, tres TCRT5000 y servos SG90. El pinout final real quedo documentado y el firmware final se cargo en COM8.
 
@@ -178,18 +209,18 @@ Robot Minisumo Final
 FUNCIONAL_PROBADO
 ```
 
-## 20. Conclusiones
+## 21. Conclusiones
 
 El proyecto final integra hardware, firmware y documentacion de forma coherente con el robot funcional real. La principal restriccion tecnica es el uso de D0 para el sensor trasero, debido a que comparte RX Serial. La recomendacion es desconectar temporalmente ese sensor durante cargas de firmware o futuras depuraciones seriales.
 
-## 21. Referencias
+## 22. Referencias
 
 - Documentacion Arduino Nano.
 - Hojas tecnicas HC-SR04, TCRT5000, SG90 y KY-012.
 - Documentacion KiCad.
 - BOM y lista final de conexiones anexadas al proyecto.
 
-## 22. Anexos
+## 23. Anexos
 
 - `firmware/`.
 - `hardware/kicad/`.

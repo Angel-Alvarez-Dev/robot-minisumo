@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Robot Minisumo - Panel Compacto</title>
-  <link rel="stylesheet" href="styles.css?v=compact-video">
+  <link rel="stylesheet" href="styles.css?v=minimal-v2">
 </head>
 <body>
   <main class="monitor">
@@ -14,29 +14,6 @@
         <span>Panel video final</span>
       </div>
 
-      <section class="status-strip" aria-label="Estado general">
-        <div class="stat">
-          <span>Conexion</span>
-          <strong id="connectionState"><span id="connectionDot" class="dot"></span>Desconectado</strong>
-        </div>
-        <div class="stat">
-          <span>Firmware</span>
-          <strong id="firmwareState">No detectado</strong>
-        </div>
-        <div class="stat">
-          <span>Distancia</span>
-          <strong id="distanceValue">Sin eco</strong>
-        </div>
-        <div class="stat">
-          <span>Accion</span>
-          <strong id="currentAction">Inicializacion</strong>
-        </div>
-        <div class="stat">
-          <span>Modo</span>
-          <strong id="modeState">Real</strong>
-        </div>
-      </section>
-
       <div class="top-actions">
         <button id="connectArduino" type="button">Conectar Arduino</button>
         <button id="disconnectArduino" type="button" disabled>Desconectar</button>
@@ -45,6 +22,29 @@
     </header>
 
     <div id="demoNotice" class="notice hidden">Modo demo: los estados son simulados desde el panel.</div>
+
+    <section class="status-strip" aria-label="Estado general">
+      <div class="stat">
+        <span>Conexion</span>
+        <strong id="connectionState"><span id="connectionDot" class="dot"></span>Desconectado</strong>
+      </div>
+      <div class="stat">
+        <span>Firmware</span>
+        <strong id="firmwareState">No detectado</strong>
+      </div>
+      <div class="stat">
+        <span>Distancia</span>
+        <strong id="distanceValue">Sin eco</strong>
+      </div>
+      <div class="stat">
+        <span>Accion</span>
+        <strong id="currentAction">Inicializacion</strong>
+      </div>
+      <div class="stat">
+        <span>Modo</span>
+        <strong id="modeState">Real</strong>
+      </div>
+    </section>
 
     <section class="main-grid">
       <aside class="panel process-panel">
@@ -133,6 +133,6 @@
     </section>
   </main>
 
-  <script src="app.js?v=compact-video"></script>
+  <script src="app.js?v=minimal-v2"></script>
 </body>
 </html>

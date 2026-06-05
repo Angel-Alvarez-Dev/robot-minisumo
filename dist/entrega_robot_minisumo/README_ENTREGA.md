@@ -21,7 +21,20 @@ El prototipo fisico del Robot Minisumo fue probado y se encuentra funcional.
 - `docs/`: BOM, conexiones, algoritmos, pseudocodigo y diagramas.
 - `validation/`: registros de pruebas, compilacion, KiCad y checklist final.
 - `web-control/`: panel web de monitoreo con modo demo y Web Serial opcional.
-- `assets/`: imagen final de conexiones y hojas Excel anexas.
+- `assets/`: hojas Excel anexas, diagrama final y evidencia multimedia organizada.
+
+## Evidencia incluida
+
+| Carpeta / archivo | Contenido | Uso |
+| --- | --- | --- |
+| `assets/images/conexiones/` | Diagrama final de conexiones. | Explicar el pinout real. |
+| `assets/images/montaje/` | Fotografias del prototipo ensamblado. | Evidencia fisica del robot. |
+| `assets/images/pruebas/` | Imagen de alimentacion/sensores activos. | Evidencia de pruebas. |
+| `assets/images/panel/` | Capturas del panel de monitoreo. | Apoyo para video final. |
+| `assets/videos/pruebas/` | Videos cortos de buzzer, servos, sensores y busqueda. | Validar componentes. |
+| `assets/videos/demo_final/robot_minisumo_demo_funcionamiento_final_01.mp4` | Video principal de funcionamiento. | Demostracion final. |
+| `docs/evidencia_multimedia.md` | Guia de evidencia multimedia. | Consulta tecnica. |
+| `validation/evidencia_funcionamiento.md` | Registro de evidencia funcional. | Validacion de entrega. |
 
 ## Nota sobre PDFs y KiCad
 

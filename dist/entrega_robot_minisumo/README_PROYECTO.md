@@ -95,6 +95,22 @@ Incluye:
 - Parseo de mensajes `STATE`, `TCRT_LEFT`, `TCRT_RIGHT`, `TCRT_BACK`, `DIST_CM`, `OPONENTE`, `MOTOR_LEFT`, `MOTOR_RIGHT` y `BUZZER`.
 - Compatibilidad con la linea de prueba `Distancia=<cm> L=<0/1> R=<0/1> B=<0/1>`.
 
+## Evidencia del proyecto
+
+La evidencia multimedia final esta organizada en `assets/` y documentada en `docs/evidencia_multimedia.md` e `docs/inventario_multimedia.md`.
+
+| Carpeta | Contenido |
+| --- | --- |
+| `assets/images/conexiones/` | Diagrama final de conexiones del robot. |
+| `assets/images/montaje/` | Fotografias del prototipo fisico ensamblado. |
+| `assets/images/pruebas/` | Evidencia visual de alimentacion y sensores activos. |
+| `assets/images/panel/` | Capturas del panel web de monitoreo. |
+| `assets/videos/pruebas/` | Videos cortos de pruebas por componente o comportamiento. |
+| `assets/videos/demo_final/` | Video principal de funcionamiento final. |
+
+Archivo principal para demostracion: `assets/videos/demo_final/robot_minisumo_demo_funcionamiento_final_01.mp4`.
+
+La publicacion en GitHub fue revisada en `docs/github_publicacion.md`; los videos integrados son ligeros y no requieren Git LFS.
 ## Licencia
 
 Proyecto academico y tecnico. Agregar licencia explicita si se publicara para reutilizacion externa.
