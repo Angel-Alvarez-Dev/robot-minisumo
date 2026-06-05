@@ -20,4 +20,5 @@
 - Confirmar SG90 de rotacion continua.
 - Validar alimentacion de servos con hardware real.
 - Ejecutar ERC/exportaciones KiCad si hay `kicad-cli`.
-- Subir a GitHub si `gh` esta autenticado.
+- Repositorio privado creado en GitHub y push inicial completado.
+

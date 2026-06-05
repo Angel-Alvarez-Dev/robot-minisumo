@@ -13,5 +13,6 @@
 | ERC/exportaciones | Pendiente | Requiere `kicad-cli` |
 | Reporte academico | Completo | `report/` |
 | Web control | Completo | `web-control/` |
-| Git | Pendiente | Inicializar/commit |
-| GitHub | Pendiente | Requiere `gh` autenticado |
+| Git | Completo | Commit inicial creado |
+| GitHub | Completo | Repo privado creado y push realizado |
+
