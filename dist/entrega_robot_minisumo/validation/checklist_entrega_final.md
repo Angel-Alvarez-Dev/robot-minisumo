@@ -58,3 +58,17 @@
 - [x] Incluye registro de eventos.
 - [x] Puede usarse para grabar video.
 - [x] Documenta si Web Serial esta implementado o no.
+
+## Panel para video final
+
+- [x] Panel cabe en una sola pantalla.
+- [x] Muestra accion actual.
+- [x] Muestra procesos activos.
+- [x] Muestra TCRT Left/Right/Back.
+- [x] Muestra HC-SR04.
+- [x] Muestra Servo Left/Right.
+- [x] Muestra Buzzer.
+- [x] Incluye pruebas rapidas.
+- [x] Incluye modo demo.
+- [x] Incluye log compacto.
+- [x] Puede usarse durante la grabacion.

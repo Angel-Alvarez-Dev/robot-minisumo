@@ -1,34 +1,115 @@
 const processDefs = [
   ["INIT", "Inicializacion"],
-  ["START_WAIT", "Espera de arranque"],
-  ["READ_LINE", "Lectura de sensores de linea"],
-  ["READ_ULTRA", "Lectura de sensor ultrasonico"],
-  ["BUSCAR", "Busqueda de oponente"],
-  ["ATACAR", "Ataque"],
-  ["EVITAR_BORDE", "Evasion de borde"],
+  ["READ_LINE", "Lectura linea"],
+  ["READ_ULTRA", "Lectura US"],
+  ["BUSCAR", "Buscar"],
+  ["ATACAR", "Atacar"],
+  ["EVITAR_BORDE", "Evadir borde"],
   ["RETROCEDER", "Retroceso"],
-  ["GIRO_IZQUIERDO", "Giro izquierdo"],
-  ["GIRO_DERECHO", "Giro derecho"],
-  ["DETENER", "Detencion"],
-  ["BUZZER", "Buzzer activo"],
+  ["GIRO_IZQUIERDO", "Giro izq."],
+  ["GIRO_DERECHO", "Giro der."],
+  ["DETENER", "Detenido"],
 ];
+
+const testDefs = {
+  TEST_SENSORES: {
+    command: "CMD:TEST_SENSORES",
+    label: "Test sensores",
+    demo: () => applyTelemetry({ state: "READ_LINE", left: 0, right: 0, back: 0, distance: 42, opponent: 0 }, "panel"),
+  },
+  TEST_SERVOS: {
+    command: "CMD:TEST_SERVOS",
+    label: "Test servos",
+    demo: () => applyTelemetry({ state: "GIRO_DERECHO", motorLeft: "AVANZAR", motorRight: "RETROCEDER" }, "panel"),
+  },
+  TEST_BUZZER: {
+    command: "CMD:TEST_BUZZER",
+    label: "Test buzzer",
+    demo: () => activateBuzzer("Prueba rapida"),
+  },
+  TEST_ULTRASONICO: {
+    command: "CMD:TEST_ULTRASONICO",
+    label: "Test ultrasonico",
+    demo: () => applyTelemetry({ state: "READ_ULTRA", distance: 23, opponent: 1 }, "panel"),
+  },
+  DEMO_BORDE: {
+    command: "CMD:DEMO_BORDE",
+    label: "Demo borde",
+    demo: () => {
+      applyTelemetry({
+        state: "EVITAR_BORDE",
+        left: 1,
+        right: 0,
+        back: 0,
+        distance: 70,
+        opponent: 0,
+        motorLeft: "RETROCEDER",
+        motorRight: "RETROCEDER",
+      }, "demo");
+      activateBuzzer("Alerta borde");
+    },
+  },
+  DEMO_ATAQUE: {
+    command: "CMD:DEMO_ATAQUE",
+    label: "Demo ataque",
+    demo: () => {
+      applyTelemetry({
+        state: "ATACAR",
+        left: 0,
+        right: 0,
+        back: 0,
+        distance: 18,
+        opponent: 1,
+        motorLeft: "ATAQUE",
+        motorRight: "ATAQUE",
+      }, "demo");
+      activateBuzzer("Ataque");
+    },
+  },
+  DEMO_BUSCAR: {
+    command: "CMD:DEMO_BUSCAR",
+    label: "Demo buscar",
+    demo: () => applyTelemetry({
+      state: "BUSCAR",
+      left: 0,
+      right: 0,
+      back: 0,
+      distance: 90,
+      opponent: 0,
+      motorLeft: "GIRANDO",
+      motorRight: "GIRANDO",
+      buzzer: "OFF",
+    }, "demo"),
+  },
+  STOP: {
+    command: "CMD:STOP",
+    label: "Stop",
+    demo: () => applyTelemetry({
+      state: "DETENER",
+      motorLeft: "DETENIDO",
+      motorRight: "DETENIDO",
+      buzzer: "OFF",
+      distance: -1,
+      opponent: 0,
+    }, "panel"),
+  },
+};
 
 const state = {
   demo: false,
   connection: "Desconectado",
-  firmware: "Esperando",
+  firmware: "No detectado",
   action: "INIT",
   tcrtLeft: 0,
   tcrtRight: 0,
   tcrtBack: 0,
-  tcrtStability: "stable",
+  lineUnstable: false,
   distanceCm: -1,
   opponent: 0,
   motorLeft: "DETENIDO",
   motorRight: "DETENIDO",
   buzzer: "OFF",
-  buzzerReason: "Sin sonido activo",
-  completed: new Set(),
+  buzzerReason: "Sin sonido",
 };
 
 let arduinoPort;
@@ -37,7 +118,6 @@ let arduinoWriter;
 let readLoopActive = false;
 let serialBuffer = "";
 let buzzerTimer;
-let unstableTimer;
 const eventLines = [];
 
 const els = {
@@ -45,200 +125,198 @@ const els = {
   demoNotice: document.querySelector("#demoNotice"),
   connectArduino: document.querySelector("#connectArduino"),
   disconnectArduino: document.querySelector("#disconnectArduino"),
-  connectionDot: document.querySelector("#connectionDot"),
   connectionState: document.querySelector("#connectionState"),
   firmwareState: document.querySelector("#firmwareState"),
-  currentAction: document.querySelector("#currentAction"),
   distanceValue: document.querySelector("#distanceValue"),
-  distanceMeter: document.querySelector("#distanceMeter"),
-  distanceDetail: document.querySelector("#distanceDetail"),
-  opponentDetail: document.querySelector("#opponentDetail"),
-  ultrasonicStatus: document.querySelector("#ultrasonicStatus"),
+  currentAction: document.querySelector("#currentAction"),
+  modeState: document.querySelector("#modeState"),
+  processStatus: document.querySelector("#processStatus"),
+  activeProcess: document.querySelector("#activeProcess"),
   processList: document.querySelector("#processList"),
-  lineLeft: document.querySelector("#lineLeft"),
-  lineRight: document.querySelector("#lineRight"),
-  lineBack: document.querySelector("#lineBack"),
-  motorLeft: document.querySelector("#motorLeft"),
-  motorRight: document.querySelector("#motorRight"),
-  buzzerIndicator: document.querySelector("#buzzerIndicator"),
-  buzzerStatus: document.querySelector("#buzzerStatus"),
-  buzzerReason: document.querySelector("#buzzerReason"),
-  eventLog: document.querySelector("#eventLog"),
+  opponentState: document.querySelector("#opponentState"),
+  commandState: document.querySelector("#commandState"),
   lastUpdate: document.querySelector("#lastUpdate"),
-  modeDescription: document.querySelector("#modeDescription"),
-  nodes: {
-    arduino: document.querySelector("#nodeArduino"),
-    shield: document.querySelector("#nodeShield"),
-    hcsr04: document.querySelector("#nodeHcsr04"),
-    tcrtLeft: document.querySelector("#nodeTcrtLeft"),
-    tcrtRight: document.querySelector("#nodeTcrtRight"),
-    tcrtBack: document.querySelector("#nodeTcrtBack"),
-    servoLeft: document.querySelector("#nodeServoLeft"),
-    servoRight: document.querySelector("#nodeServoRight"),
-    buzzer: document.querySelector("#nodeBuzzer"),
-    power: document.querySelector("#nodePower"),
-  },
+  eventLog: document.querySelector("#eventLog"),
   cards: {
+    tcrtLeft: document.querySelector("#cardTcrtLeft"),
+    tcrtRight: document.querySelector("#cardTcrtRight"),
+    tcrtBack: document.querySelector("#cardTcrtBack"),
     ultrasonic: document.querySelector("#cardUltrasonic"),
-    line: document.querySelector("#cardLine"),
-    motors: document.querySelector("#cardMotors"),
+    motorLeft: document.querySelector("#cardMotorLeft"),
+    motorRight: document.querySelector("#cardMotorRight"),
     buzzer: document.querySelector("#cardBuzzer"),
+    motion: document.querySelector("#cardMotion"),
+  },
+  values: {
+    lineLeft: document.querySelector("#lineLeftState"),
+    lineRight: document.querySelector("#lineRightState"),
+    lineBack: document.querySelector("#lineBackState"),
+    ultrasonic: document.querySelector("#ultrasonicStatus"),
+    distanceDetail: document.querySelector("#distanceDetail"),
+    motorLeft: document.querySelector("#motorLeftState"),
+    motorRight: document.querySelector("#motorRightState"),
+    buzzer: document.querySelector("#buzzerStatus"),
+    buzzerReason: document.querySelector("#buzzerReason"),
+    motion: document.querySelector("#motionState"),
+    motionDetail: document.querySelector("#motionDetail"),
   },
 };
 
 function initProcesses() {
-  els.processList.innerHTML = processDefs.map(([key, label]) => `
-    <div class="process-item" data-process="${key}">
-      <span class="process-light"></span>
-      <strong>${label}</strong>
-      <span>Inactivo</span>
-    </div>
-  `).join("");
+  els.processList.innerHTML = processDefs.map(([key, label]) => (
+    `<div class="process-chip" data-process="${key}">${label}</div>`
+  )).join("");
+}
+
+function normalizeAction(action) {
+  const aliases = {
+    START_WAIT: "INIT",
+    READ_ULTRASONICO: "READ_ULTRA",
+    RETROCESO: "RETROCEDER",
+    DETENIDO: "DETENER",
+    STOP: "DETENER",
+    BUZZER: "INIT",
+  };
+  return aliases[action] || action;
 }
 
 function actionLabel(action) {
-  const found = processDefs.find(([key]) => key === action);
-  return found ? found[1] : action;
+  const key = normalizeAction(action);
+  const found = processDefs.find(([processKey]) => processKey === key);
+  return found ? found[1] : key;
 }
 
 function logEvent(message) {
-  const line = `${new Date().toLocaleTimeString()}  ${message}`;
+  const line = `${new Date().toLocaleTimeString()} ${message}`;
   eventLines.unshift(line);
-  if (eventLines.length > 80) eventLines.pop();
+  if (eventLines.length > 8) eventLines.pop();
   els.eventLog.textContent = eventLines.join("\n");
   els.lastUpdate.textContent = line;
 }
 
+function setCardState(card, status) {
+  card.classList.remove("ok", "active", "alert", "warn");
+  if (status) card.classList.add(status);
+}
+
 function setAction(action, source = "panel") {
-  if (!action) return;
-  if (state.action !== action) {
-    state.completed.add(state.action);
-    state.action = action;
-    logEvent(`${source}: ${actionLabel(action)}`);
+  const normalized = normalizeAction(action);
+  if (state.action !== normalized) {
+    state.action = normalized;
+    logEvent(`${source} STATE:${normalized}`);
   } else {
-    state.action = action;
+    state.action = normalized;
   }
 }
 
-function classifyLine(value, unstable = false) {
-  if (unstable) return "warn";
+function lineLabel(value) {
+  if (state.lineUnstable) return "INESTABLE";
+  return value ? "BORDE" : "LIBRE";
+}
+
+function lineClass(value) {
+  if (state.lineUnstable) return "warn";
   return value ? "alert" : "ok";
 }
 
-function setClassGroup(element, stateClass) {
-  element.classList.remove("active", "alert", "warn", "ok", "moving", "reverse", "pulse");
-  if (stateClass) stateClass.split(" ").forEach((name) => element.classList.add(name));
+function motorLabel(value) {
+  const labels = {
+    AVANZAR: "AVANZA",
+    RETROCEDER: "ATRAS",
+    GIRANDO: "GIRA",
+    ATAQUE: "ATAQUE",
+    DETENIDO: "STOP",
+  };
+  return labels[value] || value || "STOP";
 }
 
-function renderProcessList() {
-  document.querySelectorAll(".process-item").forEach((item) => {
-    const key = item.dataset.process;
-    const label = item.querySelector("span:last-child");
-    item.classList.remove("active", "done", "alert");
-    if (key === state.action || (key === "BUZZER" && state.buzzer === "ON")) {
-      item.classList.add(key === "EVITAR_BORDE" ? "alert" : "active");
-      label.textContent = key === "EVITAR_BORDE" ? "Alerta" : "Activo";
-    } else if (state.completed.has(key)) {
-      item.classList.add("done");
-      label.textContent = "Completado";
-    } else {
-      label.textContent = "Inactivo";
+function motionSummary() {
+  if (state.motorLeft === "DETENIDO" && state.motorRight === "DETENIDO") {
+    return ["DETENIDO", "Motores quietos"];
+  }
+  if (state.motorLeft === "ATAQUE" || state.motorRight === "ATAQUE") {
+    return ["ATAQUE", "Avance frontal"];
+  }
+  if (state.motorLeft === "RETROCEDER" && state.motorRight === "RETROCEDER") {
+    return ["RETROCESO", "Ambos motores atras"];
+  }
+  if (state.motorLeft === "AVANZAR" && state.motorRight === "RETROCEDER") {
+    return ["GIRO DER.", "D9 avanza / D10 atras"];
+  }
+  if (state.motorLeft === "RETROCEDER" && state.motorRight === "AVANZAR") {
+    return ["GIRO IZQ.", "D9 atras / D10 avanza"];
+  }
+  if (state.motorLeft === "GIRANDO" || state.motorRight === "GIRANDO") {
+    return ["BUSQUEDA", "Giro de rastreo"];
+  }
+  return ["MOVIENDO", "Servos activos"];
+}
+
+function renderProcesses() {
+  document.querySelectorAll(".process-chip").forEach((chip) => {
+    const key = chip.dataset.process;
+    chip.classList.remove("active", "alert");
+    if (key === state.action) {
+      chip.classList.add(key === "EVITAR_BORDE" ? "alert" : "active");
     }
   });
 }
 
-function renderLineSensor(element, label, value) {
-  const unstable = state.tcrtStability === "unstable";
-  const cls = classifyLine(value, unstable);
-  element.className = `sensor-pill ${cls}`;
-  if (unstable) element.textContent = `${label}: Lectura inestable`;
-  else element.textContent = `${label}: ${value ? "Borde detectado" : "Sin borde"}`;
-}
-
-function renderMotor(element, value) {
-  const em = element.querySelector("em");
-  element.classList.remove("moving", "reverse");
-  let label = "Detenido";
-  if (value === "AVANZAR") {
-    label = "Avanzando";
-    element.classList.add("moving");
-  } else if (value === "RETROCEDER") {
-    label = "Retrocediendo";
-    element.classList.add("reverse");
-  } else if (value === "GIRANDO") {
-    label = "Girando";
-    element.classList.add("moving");
-  } else if (value === "ATAQUE") {
-    label = "Ataque";
-    element.classList.add("moving");
-  }
-  em.textContent = label;
-}
-
 function render() {
   const connected = state.connection === "Conectado";
-  els.connectionDot.classList.toggle("connected", connected);
-  els.connectionState.innerHTML = `<span id="connectionDot" class="dot ${connected ? "connected" : ""}"></span> ${state.connection}`;
+  els.connectionState.innerHTML = `<span id="connectionDot" class="dot ${connected ? "connected" : ""}"></span>${state.connection}`;
   els.connectArduino.disabled = connected;
   els.disconnectArduino.disabled = !connected;
   els.firmwareState.textContent = state.firmware;
   els.currentAction.textContent = actionLabel(state.action);
+  els.modeState.textContent = state.demo ? "Demo" : "Real";
   els.demoToggle.textContent = state.demo ? "Modo demo ON" : "Modo demo OFF";
   els.demoNotice.classList.toggle("hidden", !state.demo);
-  els.modeDescription.textContent = state.demo
-    ? "Modo demo activo: los estados son simulados desde el panel."
-    : "Datos reales por Web Serial cuando se conecte Arduino; modo demo disponible para video.";
+  els.activeProcess.textContent = actionLabel(state.action);
+  els.processStatus.textContent = state.action === "EVITAR_BORDE" ? "Alerta" : "Activo";
+  els.opponentState.textContent = `Oponente: ${state.opponent ? "Si" : "No"}`;
 
   const distanceText = state.distanceCm >= 0 ? `${state.distanceCm} cm` : "Sin eco";
   els.distanceValue.textContent = distanceText;
-  els.distanceDetail.textContent = distanceText;
-  els.distanceMeter.value = state.distanceCm > 0 ? Math.min(state.distanceCm, 120) : 0;
-  els.opponentDetail.textContent = state.opponent ? "Si" : "No";
+  els.values.distanceDetail.textContent = distanceText;
 
-  let ultraClass = "";
-  let ultraStatus = "Sin objeto";
-  if (state.distanceCm < 0) {
-    ultraClass = "warn";
-    ultraStatus = "Error de lectura / sin eco";
-  } else if (state.distanceCm <= 15) {
-    ultraClass = "alert";
-    ultraStatus = "Objeto cerca / atacar";
-  } else if (state.distanceCm <= 35) {
+  els.values.lineLeft.textContent = lineLabel(state.tcrtLeft);
+  els.values.lineRight.textContent = lineLabel(state.tcrtRight);
+  els.values.lineBack.textContent = lineLabel(state.tcrtBack);
+  setCardState(els.cards.tcrtLeft, lineClass(state.tcrtLeft));
+  setCardState(els.cards.tcrtRight, lineClass(state.tcrtRight));
+  setCardState(els.cards.tcrtBack, lineClass(state.tcrtBack));
+
+  let ultraClass = "warn";
+  let ultraLabel = "SIN ECO";
+  if (state.distanceCm > 35) {
+    ultraClass = "ok";
+    ultraLabel = "LEJOS";
+  } else if (state.distanceCm > 15) {
     ultraClass = "active";
-    ultraStatus = "Objeto en rango";
-  } else if (state.distanceCm <= 80) {
-    ultraStatus = "Objeto lejos";
+    ultraLabel = "EN RANGO";
+  } else if (state.distanceCm >= 0) {
+    ultraClass = "alert";
+    ultraLabel = "CERCA";
   }
-  els.ultrasonicStatus.textContent = ultraStatus;
+  els.values.ultrasonic.textContent = ultraLabel;
+  setCardState(els.cards.ultrasonic, ultraClass);
 
-  renderLineSensor(els.lineLeft, "Left D3", state.tcrtLeft);
-  renderLineSensor(els.lineRight, "Right D2", state.tcrtRight);
-  renderLineSensor(els.lineBack, "Back D0", state.tcrtBack);
+  els.values.motorLeft.textContent = motorLabel(state.motorLeft);
+  els.values.motorRight.textContent = motorLabel(state.motorRight);
+  setCardState(els.cards.motorLeft, state.motorLeft === "DETENIDO" ? "ok" : "active");
+  setCardState(els.cards.motorRight, state.motorRight === "DETENIDO" ? "ok" : "active");
 
-  renderMotor(els.motorLeft, state.motorLeft);
-  renderMotor(els.motorRight, state.motorRight);
+  els.values.buzzer.textContent = state.buzzer;
+  els.values.buzzerReason.textContent = state.buzzerReason;
+  setCardState(els.cards.buzzer, state.buzzer === "ON" ? "warn" : "ok");
 
-  els.buzzerIndicator.classList.toggle("on", state.buzzer === "ON");
-  els.buzzerStatus.textContent = state.buzzer === "ON" ? "Activo" : "Apagado";
-  els.buzzerReason.textContent = state.buzzerReason;
+  const [motion, detail] = motionSummary();
+  els.values.motion.textContent = motion;
+  els.values.motionDetail.textContent = detail;
+  setCardState(els.cards.motion, motion === "DETENIDO" ? "ok" : (motion === "ATAQUE" ? "alert" : "active"));
 
-  setClassGroup(els.cards.ultrasonic, ultraClass);
-  setClassGroup(els.cards.line, (state.tcrtLeft || state.tcrtRight || state.tcrtBack) ? "alert" : "");
-  setClassGroup(els.cards.motors, (state.motorLeft !== "DETENIDO" || state.motorRight !== "DETENIDO") ? "active" : "");
-  setClassGroup(els.cards.buzzer, state.buzzer === "ON" ? "warn" : "");
-
-  setClassGroup(els.nodes.arduino, connected ? "active" : "");
-  setClassGroup(els.nodes.shield, "active");
-  setClassGroup(els.nodes.power, "active");
-  setClassGroup(els.nodes.hcsr04, ultraClass || "active");
-  setClassGroup(els.nodes.tcrtLeft, classifyLine(state.tcrtLeft, state.tcrtStability === "unstable"));
-  setClassGroup(els.nodes.tcrtRight, classifyLine(state.tcrtRight, state.tcrtStability === "unstable"));
-  setClassGroup(els.nodes.tcrtBack, classifyLine(state.tcrtBack, state.tcrtStability === "unstable"));
-  setClassGroup(els.nodes.servoLeft, state.motorLeft === "DETENIDO" ? "" : "active pulse");
-  setClassGroup(els.nodes.servoRight, state.motorRight === "DETENIDO" ? "" : "active pulse");
-  setClassGroup(els.nodes.buzzer, state.buzzer === "ON" ? "warn pulse" : "");
-
-  renderProcessList();
+  renderProcesses();
 }
 
 function applyTelemetry(update, source = "serial") {
@@ -246,6 +324,7 @@ function applyTelemetry(update, source = "serial") {
   if ("left" in update) state.tcrtLeft = Number(update.left);
   if ("right" in update) state.tcrtRight = Number(update.right);
   if ("back" in update) state.tcrtBack = Number(update.back);
+  if ("unstable" in update) state.lineUnstable = Boolean(update.unstable);
   if ("distance" in update) {
     state.distanceCm = Number(update.distance);
     state.opponent = state.distanceCm > 0 && state.distanceCm <= 35 ? 1 : 0;
@@ -255,15 +334,19 @@ function applyTelemetry(update, source = "serial") {
   if (update.motorRight) state.motorRight = update.motorRight;
   if (update.buzzer) {
     state.buzzer = update.buzzer;
-    state.buzzerReason = update.reason || (update.buzzer === "ON" ? "Evento del robot" : "Sin sonido activo");
+    state.buzzerReason = update.buzzer === "ON" ? (update.reason || "Activo") : "Sin sonido";
   }
   render();
 }
 
 function parseArduinoLine(line) {
   if (!line) return;
-  logEvent(`Serial: ${line}`);
-  if (line.includes("Robot Minisumo") || line.includes("FUNCIONAL_PROBADO")) state.firmware = "Detectado";
+  logEvent(line);
+  if (line.includes("Robot Minisumo") || line.includes("FUNCIONAL_PROBADO")) {
+    state.firmware = "Detectado";
+    render();
+    return;
+  }
 
   const legacy = line.match(/Distancia=(-?\d+)\s+L=(\d)\s+R=(\d)\s+B=(\d)/);
   if (legacy) {
@@ -272,25 +355,28 @@ function parseArduinoLine(line) {
       left: Number(legacy[2]),
       right: Number(legacy[3]),
       back: Number(legacy[4]),
+      unstable: false,
     }, "serial");
     return;
   }
 
   const [rawKey, ...rest] = line.split(":");
+  if (!rest.length) return;
   const key = rawKey.trim();
   const value = rest.join(":").trim();
-  if (!key || !rest.length) return;
+  const update = { unstable: false };
 
-  const update = {};
   if (key === "STATE") update.state = value;
-  if (key === "TCRT_LEFT") update.left = Number(value);
-  if (key === "TCRT_RIGHT") update.right = Number(value);
-  if (key === "TCRT_BACK") update.back = Number(value);
-  if (key === "DIST_CM") update.distance = Number(value);
-  if (key === "OPONENTE") update.opponent = Number(value);
-  if (key === "MOTOR_LEFT") update.motorLeft = value;
-  if (key === "MOTOR_RIGHT") update.motorRight = value;
-  if (key === "BUZZER") update.buzzer = value;
+  else if (key === "TCRT_LEFT") update.left = Number(value);
+  else if (key === "TCRT_RIGHT") update.right = Number(value);
+  else if (key === "TCRT_BACK") update.back = Number(value);
+  else if (key === "DIST_CM") update.distance = Number(value);
+  else if (key === "OPONENTE") update.opponent = Number(value);
+  else if (key === "MOTOR_LEFT") update.motorLeft = value;
+  else if (key === "MOTOR_RIGHT") update.motorRight = value;
+  else if (key === "BUZZER") update.buzzer = value;
+  else return;
+
   applyTelemetry(update, "serial");
 }
 
@@ -304,7 +390,7 @@ function handleSerialText(text) {
 async function connectToArduino() {
   if (!("serial" in navigator)) {
     state.connection = "Web Serial no disponible";
-    logEvent("Este navegador no expone Web Serial API. Usa modo demo.");
+    logEvent("Web Serial no disponible; usar modo demo.");
     render();
     return;
   }
@@ -314,7 +400,7 @@ async function connectToArduino() {
   readLoopActive = true;
   state.connection = "Conectado";
   state.demo = false;
-  logEvent("Arduino conectado por Web Serial.");
+  logEvent("Arduino conectado.");
   render();
   readArduinoLoop();
 }
@@ -354,114 +440,39 @@ async function readArduinoLoop() {
 
 function setDemoEnabled(enabled) {
   state.demo = enabled;
-  if (enabled) {
-    state.connection = "Modo demo";
-    logEvent("Modo demo activado.");
-  } else {
-    state.connection = arduinoPort ? "Conectado" : "Desconectado";
-    logEvent("Modo demo desactivado.");
-  }
+  state.connection = enabled ? "Modo demo" : (arduinoPort ? "Conectado" : "Desconectado");
+  logEvent(enabled ? "Modo demo ON" : "Modo demo OFF");
   render();
-}
-
-function resetLineSensors() {
-  state.tcrtLeft = 0;
-  state.tcrtRight = 0;
-  state.tcrtBack = 0;
-  state.tcrtStability = "stable";
 }
 
 function activateBuzzer(reason) {
   clearTimeout(buzzerTimer);
-  state.buzzer = "ON";
-  state.buzzerReason = reason;
+  applyTelemetry({ buzzer: "ON", reason }, "panel");
   buzzerTimer = setTimeout(() => {
-    state.buzzer = "OFF";
-    state.buzzerReason = "Sin sonido activo";
-    render();
-  }, 1200);
+    applyTelemetry({ buzzer: "OFF" }, "panel");
+  }, 900);
 }
 
-function demoScenario(name) {
-  setDemoEnabled(true);
-  clearTimeout(unstableTimer);
-  resetLineSensors();
-  state.distanceCm = 70;
-  state.opponent = 0;
-  state.motorLeft = "DETENIDO";
-  state.motorRight = "DETENIDO";
-  state.buzzer = "OFF";
-  state.buzzerReason = "Sin sonido activo";
+async function sendCommand(command) {
+  if (!arduinoWriter) return false;
+  const encoder = new TextEncoder();
+  await arduinoWriter.write(encoder.encode(`${command}\n`));
+  return true;
+}
 
-  if (name === "EDGE_LEFT") {
-    state.tcrtLeft = 1;
-    setAction("EVITAR_BORDE", "demo");
-    state.motorLeft = "RETROCEDER";
-    state.motorRight = "RETROCEDER";
-    activateBuzzer("Alerta borde izquierdo");
-  }
-  if (name === "EDGE_RIGHT") {
-    state.tcrtRight = 1;
-    setAction("EVITAR_BORDE", "demo");
-    state.motorLeft = "RETROCEDER";
-    state.motorRight = "RETROCEDER";
-    activateBuzzer("Alerta borde derecho");
-  }
-  if (name === "EDGE_BACK") {
-    state.tcrtBack = 1;
-    setAction("EVITAR_BORDE", "demo");
-    state.motorLeft = "RETROCEDER";
-    state.motorRight = "RETROCEDER";
-    activateBuzzer("Alerta borde trasero");
-  }
-  if (name === "UNSTABLE_LINE") {
-    state.tcrtStability = "unstable";
-    setAction("READ_LINE", "demo");
-    logEvent("demo: sensores de linea con lectura inestable.");
-  }
-  if (name === "OPPONENT_CLOSE") {
-    state.distanceCm = 20;
-    state.opponent = 1;
-    setAction("READ_ULTRA", "demo");
-  }
-  if (name === "ATTACK") {
-    state.distanceCm = 18;
-    state.opponent = 1;
-    setAction("ATACAR", "demo");
-    state.motorLeft = "ATAQUE";
-    state.motorRight = "ATAQUE";
-    activateBuzzer("Ataque");
-  }
-  if (name === "SEARCH") {
-    state.distanceCm = 90;
-    setAction("BUSCAR", "demo");
-    state.motorLeft = "GIRANDO";
-    state.motorRight = "GIRANDO";
-  }
-  if (name === "REVERSE") {
-    setAction("RETROCEDER", "demo");
-    state.motorLeft = "RETROCEDER";
-    state.motorRight = "RETROCEDER";
-  }
-  if (name === "TURN_LEFT") {
-    setAction("GIRO_IZQUIERDO", "demo");
-    state.motorLeft = "RETROCEDER";
-    state.motorRight = "AVANZAR";
-  }
-  if (name === "TURN_RIGHT") {
-    setAction("GIRO_DERECHO", "demo");
-    state.motorLeft = "AVANZAR";
-    state.motorRight = "RETROCEDER";
-  }
-  if (name === "BUZZER") {
-    setAction("BUZZER", "demo");
-    activateBuzzer("Activado manualmente");
-  }
-  if (name === "STOP") {
-    setAction("DETENER", "demo");
-    state.motorLeft = "DETENIDO";
-    state.motorRight = "DETENIDO";
-    state.distanceCm = -1;
+async function runQuickTest(name) {
+  const test = testDefs[name];
+  if (!test) return;
+
+  if (!arduinoPort) setDemoEnabled(true);
+  test.demo();
+  els.commandState.textContent = test.command;
+
+  try {
+    const sent = await sendCommand(test.command);
+    logEvent(sent ? `Enviado ${test.command}` : `Preparado ${test.command}`);
+  } catch (error) {
+    logEvent(`CMD error: ${error.message}`);
   }
   render();
 }
@@ -469,19 +480,19 @@ function demoScenario(name) {
 els.demoToggle.addEventListener("click", () => setDemoEnabled(!state.demo));
 els.connectArduino.addEventListener("click", () => {
   connectToArduino().catch((error) => {
-    state.connection = "Error de conexion";
-    logEvent(`Error de conexion: ${error.message}`);
+    state.connection = "Error conexion";
+    logEvent(`Error conexion: ${error.message}`);
     render();
   });
 });
 els.disconnectArduino.addEventListener("click", () => {
-  disconnectFromArduino().catch((error) => logEvent(`Error al desconectar: ${error.message}`));
+  disconnectFromArduino().catch((error) => logEvent(`Error desconectar: ${error.message}`));
 });
 
-document.querySelectorAll("[data-demo]").forEach((button) => {
-  button.addEventListener("click", () => demoScenario(button.dataset.demo));
+document.querySelectorAll("[data-test]").forEach((button) => {
+  button.addEventListener("click", () => runQuickTest(button.dataset.test));
 });
 
 initProcesses();
-logEvent("Panel listo para monitoreo y grabacion.");
+logEvent("Panel compacto listo.");
 render();

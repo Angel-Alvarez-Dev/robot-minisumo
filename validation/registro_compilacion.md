@@ -17,6 +17,6 @@ Puerto detectado: COM8 serial Serial Port (USB) Unknown
 | `firmware/test_servos` | `arduino:avr:nano` | Compila: 2322 bytes programa, 344 bytes RAM | No aplica | Verificado final con D9/D10 |
 | `firmware/test_buzzer` | `arduino:avr:nano` | Compila: 1988 bytes programa, 208 bytes RAM | No aplica | Verificado final con D7 |
 | `firmware/test_servo_d9` | `arduino:avr:nano` | Compila: 2192 bytes programa, 310 bytes RAM | No aplica | Incluido como evidencia de calibracion D9 |
-| `firmware/robot_minisumo_final` | `arduino:avr:nano` | Compila: 5812 bytes programa, 742 bytes RAM | No aplica | Firmware final con telemetria Serial para panel web verificado |
+| `firmware/robot_minisumo_final` | `arduino:avr:nano` | Compila: 8498 bytes programa, 874 bytes RAM | No aplica | Firmware final con telemetria Serial y comandos `CMD:*` para panel compacto verificado |
 
 Nota: se mantiene generacion manual de pulsos para SG90; no se requiere `Servo.h`.

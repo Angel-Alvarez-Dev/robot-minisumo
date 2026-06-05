@@ -1,17 +1,8 @@
-# Robot Minisumo - Panel de Monitoreo
+# Panel compacto Robot Minisumo
 
-Panel local para mostrar en tiempo real el estado del Robot Minisumo durante pruebas y grabacion de video.
+Panel web local para grabar el video final del Robot Minisumo sin scroll innecesario. La vista concentra proceso activo, sensores, actuadores, movimiento, pruebas rapidas y eventos recientes.
 
-## Abrir el panel
-
-Demo local:
-
-```powershell
-cd A:\robot-minisumo
-start .\web-control\index.html
-```
-
-Con Web Serial:
+## Abrir
 
 ```powershell
 cd A:\robot-minisumo
@@ -24,71 +15,62 @@ Abrir:
 http://localhost:8080/web-control/
 ```
 
-## Que muestra
+Tambien puede abrirse directo con `web-control/index.html`, pero `localhost` es mejor para Web Serial.
 
-- Procesos activos del robot.
-- Accion actual.
-- HC-SR04 con distancia en cm y oponente detectado.
-- TCRT5000 Left, Right y Back.
-- Servo/Motor izquierdo y derecho.
-- Buzzer KY-012.
-- Diagrama visual del robot con Arduino Nano, Shield, sensores, motores, buzzer y alimentacion/GND comun.
-- Registro de eventos para explicar lo que esta pasando.
+## Vista en tiempo real
 
-## Modo demo / grabacion
+- Conexion: conectado, desconectado o modo demo.
+- Firmware: detectado o no detectado.
+- Distancia: valor HC-SR04 en cm o sin eco.
+- Accion: buscar, atacar, evadir borde, giro, retroceso o detenido.
+- Modo: real o demo.
+- TCRT Left, Right y Back: libre, borde o inestable.
+- Servo Left y Servo Right: stop, avanza, atras, gira o ataque.
+- Buzzer: ON/OFF.
+- Movimiento resumido del robot.
 
-El boton `Modo demo` activa una simulacion visual. El panel muestra claramente:
+## Pruebas rapidas
 
-```text
-Modo demo: los estados son simulados desde el panel.
-```
-
-Botones disponibles:
-
-- Simular borde izquierdo.
-- Simular borde derecho.
-- Simular borde trasero.
-- Simular lectura inestable.
-- Simular oponente cerca.
-- Simular ataque.
-- Simular busqueda.
-- Simular retroceso.
-- Simular giro izquierdo.
-- Simular giro derecho.
-- Activar buzzer.
-- Detener robot.
-
-## Conexion Arduino
-
-El boton `Conectar Arduino` usa Web Serial API de forma opcional. Si el navegador la soporta, selecciona el puerto del Arduino y lee mensajes a 9600 baudios.
-
-Si Web Serial no esta disponible, se mantiene modo demo.
-
-## Mensajes Serial soportados
-
-| Mensaje Serial | Significado | Accion en el panel |
+| Boton | Comando Serial | Efecto visual |
 | --- | --- | --- |
-| `STATE:BUSCAR` | Robot buscando oponente | Activa busqueda |
-| `STATE:ATACAR` | Robot atacando | Activa ataque |
-| `STATE:EVITAR_BORDE` | Robot evitando borde | Marca alerta de borde |
-| `TCRT_LEFT:1` | Sensor izquierdo detecta borde | TCRT Left rojo |
-| `TCRT_RIGHT:1` | Sensor derecho detecta borde | TCRT Right rojo |
-| `TCRT_BACK:1` | Sensor trasero detecta borde | TCRT Back rojo |
-| `DIST_CM:20` | Distancia medida | Actualiza barra ultrasonica |
-| `OPONENTE:1` | Oponente detectado | Muestra oponente en rango |
-| `MOTOR_LEFT:AVANZAR` | Motor izquierdo avanzando | Anima motor izquierdo |
-| `MOTOR_RIGHT:RETROCEDER` | Motor derecho retrocediendo | Anima motor derecho |
-| `BUZZER:ON` | Buzzer activo | Enciende indicador sonoro |
-| `BUZZER:OFF` | Buzzer apagado | Apaga indicador sonoro |
+| Test sensores | `CMD:TEST_SENSORES` | Lectura linea y tarjetas TCRT |
+| Test servos | `CMD:TEST_SERVOS` | Movimiento de servos |
+| Test buzzer | `CMD:TEST_BUZZER` | Buzzer ON temporal |
+| Test ultrasonico | `CMD:TEST_ULTRASONICO` | Distancia y oponente |
+| Demo borde | `CMD:DEMO_BORDE` | Borde, retroceso y buzzer |
+| Demo ataque | `CMD:DEMO_ATAQUE` | Ataque y oponente cerca |
+| Demo buscar | `CMD:DEMO_BUSCAR` | Busqueda/giro |
+| Stop | `CMD:STOP` | Detiene motores |
 
-Tambien acepta:
+Si Arduino esta conectado por Web Serial, el panel envia el comando. Si no esta conectado, el panel activa modo demo y simula el estado para grabacion.
 
-```text
-Distancia=23 L=0 R=1 B=0
-```
+## Web Serial
+
+El boton `Conectar Arduino` abre Web Serial API a 9600 baudios. El firmware final reconoce los comandos `CMD:*` anteriores y publica telemetria.
+
+Mensajes leidos por el panel:
+
+- `STATE:BUSCAR`
+- `STATE:ATACAR`
+- `STATE:EVITAR_BORDE`
+- `STATE:RETROCESO` o `STATE:RETROCEDER`
+- `STATE:GIRO_IZQUIERDO`
+- `STATE:GIRO_DERECHO`
+- `STATE:DETENIDO` o `STATE:DETENER`
+- `TCRT_LEFT:0`
+- `TCRT_RIGHT:1`
+- `TCRT_BACK:0`
+- `DIST_CM:23`
+- `OPONENTE:1`
+- `MOTOR_LEFT:AVANZAR`
+- `MOTOR_RIGHT:RETROCEDER`
+- `BUZZER:ON`
+- `BUZZER:OFF`
+
+Los mensajes desconocidos no rompen la interfaz; solo aparecen en eventos recientes.
 
 ## Limitaciones
 
-- Web Serial requiere navegador compatible y permiso del usuario.
-- Para Web Serial, usar `localhost` es preferible a abrir el archivo directo.
-- D0/RX se usa para `TCRT_BACK`; desconectar temporalmente ese sensor si interfiere con la carga de firmware.
+- Web Serial requiere navegador compatible, normalmente Chromium.
+- Para ver telemetria real hay que cargar el firmware actualizado en Arduino.
+- D0/RX se usa para `TCRT_BACK`; desconectar temporalmente ese sensor si interfiere con carga de firmware.

@@ -1,120 +1,108 @@
-# Panel web de monitoreo
+# Panel web de monitoreo compacto
 
-El panel web de monitoreo sirve como tablero visual para grabar y explicar el Robot Minisumo en funcionamiento. Muestra procesos activos, sensores, servos, buzzer, accion actual, registro de eventos y un diagrama vivo con los componentes reales del proyecto.
-
-## Componentes representados
-
-- Arduino Nano.
-- Arduino Nano Expansion I/O Shield.
-- HC-SR04 ultrasonico.
-- TCRT5000 Left en D3.
-- TCRT5000 Right en D2.
-- TCRT5000 Back en D0.
-- Servo/Motor izquierdo SG90 en D9.
-- Servo/Motor derecho SG90 en D10.
-- Buzzer activo KY-012 en D7.
-- Alimentacion y GND comun.
+El panel web fue simplificado para usarse durante la grabacion final del Robot Minisumo. Su objetivo es mostrar en una sola pantalla de laptop lo importante del robot: proceso activo, sensores, actuadores, movimiento, pruebas rapidas y eventos recientes.
 
 ## Como abrirlo
-
-Opcion para demo local:
-
-```powershell
-cd A:\robot-minisumo
-start .\web-control\index.html
-```
-
-Opcion recomendada para Web Serial:
 
 ```powershell
 cd A:\robot-minisumo
 python -m http.server 8080
 ```
 
-Despues abrir:
+Abrir:
 
 ```text
 http://localhost:8080/web-control/
 ```
 
-Web Serial funciona mejor en navegadores basados en Chromium y en contexto seguro como `localhost`.
+## Que se ve en tiempo real
 
-## Modo demo / grabacion
+Estado general:
 
-El modo demo permite mostrar estados aun sin Arduino conectado. El panel indica claramente:
+- Conexion: conectado, desconectado, error o modo demo.
+- Firmware: detectado o no detectado.
+- Distancia HC-SR04: valor en cm o sin eco.
+- Accion actual: buscar, atacar, evadir borde, retroceso, giro o detenido.
+- Modo: real o demo.
+
+Procesos compactos:
+
+- Inicializacion.
+- Lectura linea.
+- Lectura US.
+- Buscar.
+- Atacar.
+- Evadir borde.
+- Retroceso.
+- Giro izquierda.
+- Giro derecha.
+- Detenido.
+
+Componentes:
+
+- TCRT5000 Left en D3.
+- TCRT5000 Right en D2.
+- TCRT5000 Back en D0/RX.
+- HC-SR04 en D4/D5.
+- Servo Left en D9.
+- Servo Right en D10.
+- Buzzer KY-012 en D7.
+- Movimiento resumido.
+
+## Modo demo
+
+Si no hay Arduino conectado, los botones activan modo demo automaticamente. El panel muestra:
 
 ```text
 Modo demo: los estados son simulados desde el panel.
 ```
 
-Controles incluidos:
+Este modo sirve para repetir casos frente a camara sin depender del movimiento fisico del robot.
 
-- Simular borde izquierdo.
-- Simular borde derecho.
-- Simular borde trasero.
-- Simular lectura inestable.
-- Simular oponente cerca.
-- Simular ataque.
-- Simular busqueda.
-- Simular retroceso.
-- Simular giro izquierdo.
-- Simular giro derecho.
-- Activar buzzer.
-- Detener robot.
+## Pruebas desde el panel
 
-Este modo es util para grabar la explicacion del sistema cuando se necesita repetir un caso especifico frente a camara.
+| Boton | Comando Serial | Accion |
+| --- | --- | --- |
+| Test sensores | `CMD:TEST_SENSORES` | Solicita lectura de TCRT y distancia |
+| Test servos | `CMD:TEST_SERVOS` | Ejecuta prueba corta de servos |
+| Test buzzer | `CMD:TEST_BUZZER` | Activa buzzer |
+| Test ultrasonico | `CMD:TEST_ULTRASONICO` | Solicita lectura HC-SR04 |
+| Demo borde | `CMD:DEMO_BORDE` | Muestra evasion de borde |
+| Demo ataque | `CMD:DEMO_ATAQUE` | Muestra ataque corto |
+| Demo buscar | `CMD:DEMO_BUSCAR` | Muestra busqueda/giro |
+| Stop | `CMD:STOP` | Detiene motores temporalmente |
 
-## Web Serial opcional
-
-El boton `Conectar Arduino` usa Web Serial API si el navegador lo soporta. El panel solicita seleccionar el puerto del Arduino, abre la conexion a 9600 baudios y procesa lineas Serial emitidas por el firmware final.
-
-Si Web Serial no esta disponible, el panel muestra una advertencia y mantiene disponible el modo demo.
+Cuando Web Serial esta conectado, el comando se envia al Arduino. Cuando no hay conexion, el panel simula el estado visualmente.
 
 ## Mensajes Serial reconocidos
 
 | Mensaje Serial | Significado | Accion en el panel |
 | --- | --- | --- |
-| `STATE:BUSCAR` | Robot buscando oponente | Activa proceso busqueda |
-| `STATE:ATACAR` | Robot atacando | Activa proceso ataque |
-| `STATE:EVITAR_BORDE` | Robot evitando borde | Activa alerta de borde |
-| `STATE:RETROCEDER` | Robot retrocediendo | Activa proceso retroceso |
-| `STATE:GIRO_IZQUIERDO` | Robot girando a la izquierda | Activa proceso giro izquierdo |
-| `STATE:GIRO_DERECHO` | Robot girando a la derecha | Activa proceso giro derecho |
-| `STATE:DETENER` | Robot detenido | Activa proceso detencion |
-| `TCRT_LEFT:1` | Sensor izquierdo detecta borde | Activa TCRT Left en rojo |
-| `TCRT_RIGHT:1` | Sensor derecho detecta borde | Activa TCRT Right en rojo |
-| `TCRT_BACK:1` | Sensor trasero detecta borde | Activa TCRT Back en rojo |
-| `DIST_CM:20` | Distancia medida | Actualiza barra ultrasonica |
-| `OPONENTE:1` | Oponente dentro del umbral | Muestra oponente detectado |
-| `MOTOR_LEFT:AVANZAR` | Motor izquierdo avanza | Muestra flecha/movimiento izquierdo |
-| `MOTOR_RIGHT:RETROCEDER` | Motor derecho retrocede | Muestra movimiento inverso derecho |
-| `BUZZER:ON` | Buzzer activo | Activa indicador sonoro |
-| `BUZZER:OFF` | Buzzer apagado | Desactiva indicador sonoro |
+| `STATE:BUSCAR` | Robot buscando oponente | Activa proceso buscar |
+| `STATE:ATACAR` | Robot atacando | Activa proceso atacar |
+| `STATE:EVITAR_BORDE` | Robot evitando borde | Marca alerta de borde |
+| `STATE:RETROCESO` | Robot retrocediendo | Activa retroceso |
+| `STATE:GIRO_IZQUIERDO` | Robot gira a la izquierda | Activa giro izquierdo |
+| `STATE:GIRO_DERECHO` | Robot gira a la derecha | Activa giro derecho |
+| `STATE:DETENIDO` | Robot detenido | Activa detenido |
+| `TCRT_LEFT:1` | Sensor izquierdo detecta borde | TCRT Left rojo |
+| `TCRT_RIGHT:1` | Sensor derecho detecta borde | TCRT Right rojo |
+| `TCRT_BACK:1` | Sensor trasero detecta borde | TCRT Back rojo |
+| `DIST_CM:20` | Distancia medida | Actualiza HC-SR04 |
+| `OPONENTE:1` | Oponente detectado | Marca oponente si |
+| `MOTOR_LEFT:AVANZAR` | Servo izquierdo avanza | Muestra Servo Left activo |
+| `MOTOR_RIGHT:RETROCEDER` | Servo derecho retrocede | Muestra Servo Right activo |
+| `BUZZER:ON` | Buzzer activo | Muestra buzzer ON |
 
-Tambien se mantiene compatibilidad con la linea de prueba anterior:
+El panel tambien conserva compatibilidad con:
 
 ```text
 Distancia=23 L=0 R=1 B=0
 ```
 
-## Estados visuales
-
-- TCRT5000: verde sin borde, rojo borde detectado, amarillo lectura inestable.
-- HC-SR04: barra numerica en cm, estado de objeto lejos, objeto en rango, objeto cerca/atacar o error de lectura.
-- Servos/Motores: detenido, avanzando, retrocediendo, girando o ataque.
-- Buzzer: apagado, arranque, alerta de borde, ataque o error segun el motivo mostrado.
-- Procesos: inactivo, activo, completado o alerta.
-
 ## Limitaciones
 
-- Web Serial depende del navegador y del permiso del usuario para seleccionar el puerto.
-- D0 es RX Serial del Arduino Nano y en el robot final tambien se usa para `TCRT_BACK`; si interfiere con la carga de firmware, desconectar temporalmente el DO del sensor trasero.
-- El modo demo no representa lecturas reales del Arduino; solo simula estados desde el panel.
-
-## Uso recomendado para video final
-
-1. Abrir el panel en laptop.
-2. Activar modo demo para explicar cada caso sin depender del movimiento fisico.
-3. Conectar Arduino con Web Serial si se desea mostrar telemetria real.
-4. Mostrar el diagrama vivo mientras el robot busca, detecta borde, detecta oponente y ataca.
-5. Usar el registro de eventos como apoyo verbal para explicar que proceso esta ocurriendo.
+- Web Serial requiere navegador compatible y permiso para seleccionar puerto.
+- Para telemetria real se debe cargar el firmware actualizado en Arduino.
+- D0 comparte RX Serial; si el sensor trasero interfiere con carga, desconectar temporalmente su DO.
+- El log se limita a 8 eventos para mantener la pantalla limpia durante video.

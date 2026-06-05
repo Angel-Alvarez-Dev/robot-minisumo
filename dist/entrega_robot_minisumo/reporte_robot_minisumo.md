@@ -97,11 +97,11 @@ const byte PIN_SERVO_LEFT = 9;
 const byte PIN_SERVO_RIGHT = 10;
 ```
 
-Funciones principales: `configurarPines`, `leerUltrasonico`, `leerSensoresLinea`, `avanzar`, `retroceder`, `girarIzquierda`, `girarDerecha`, `detenerRobot`, `buscarOponente`, `atacar`, `evitarBorde`, `sonarBuzzer`, `pruebaSensores`, `pruebaServos` y `publicarEstadoPanel`.
+Funciones principales: `configurarPines`, `leerUltrasonico`, `leerSensoresLinea`, `avanzar`, `retroceder`, `girarIzquierda`, `girarDerecha`, `detenerRobot`, `buscarOponente`, `atacar`, `evitarBorde`, `sonarBuzzer`, `pruebaSensores`, `pruebaUltrasonico`, `pruebaServos`, `procesarComandoPanel` y `publicarEstadoPanel`.
 
 ## 13. Panel de monitoreo para demostracion
 
-Se agrego un panel web de monitoreo en `web-control/` para apoyar la grabacion del robot funcionando. El objetivo del panel es mostrar de forma clara y visual lo que ocurre durante la operacion del Robot Minisumo, de modo que los procesos internos puedan explicarse en video mientras el prototipo se mueve o mientras se simulan estados controlados.
+Se agrego un panel web de monitoreo compacto en `web-control/` para apoyar la grabacion del robot funcionando. El objetivo del panel es mostrar en una sola pantalla de laptop lo importante de la operacion: proceso activo, sensores, actuadores, movimiento, pruebas rapidas y eventos recientes.
 
 Componentes monitoreados:
 
@@ -110,32 +110,30 @@ Componentes monitoreados:
 - Servo/Motor izquierdo SG90.
 - Servo/Motor derecho SG90.
 - Buzzer KY-012.
-- Arduino Nano.
-- Arduino Nano Expansion I/O Shield.
-- Alimentacion y GND comun.
+- Movimiento resumido del robot.
 
 Procesos mostrados:
 
 - Inicializacion.
-- Espera de arranque.
-- Lectura de sensores de linea.
-- Lectura de sensor ultrasonico.
-- Busqueda de oponente.
+- Lectura de linea.
+- Lectura ultrasonica.
+- Buscar.
 - Ataque.
-- Evasion de borde.
+- Evadir borde.
 - Retroceso.
 - Giro izquierdo.
 - Giro derecho.
-- Detencion.
-- Buzzer activo.
+- Detenido.
 
-El panel incluye modo demo / grabacion. En este modo los estados son simulados desde el panel y se indica claramente al usuario que no corresponden a lecturas reales del Arduino. Esto permite preparar tomas de video donde se expliquen casos concretos como borde izquierdo, borde derecho, borde trasero, oponente cerca, ataque, busqueda, retroceso, giros, buzzer y detencion.
+El panel incluye modo demo / grabacion. En este modo los estados son simulados desde el panel y se indica claramente al usuario que no corresponden a lecturas reales del Arduino. Esto permite preparar tomas de video donde se expliquen casos como borde, ataque, busqueda, pruebas de sensores, pruebas de servos, buzzer y detencion.
 
-Tambien se implemento integracion opcional con Web Serial API. Si el navegador soporta Web Serial, el boton `Conectar Arduino` permite seleccionar el puerto del Arduino a 9600 baudios. El firmware final publica mensajes como `STATE:BUSCAR`, `STATE:ATACAR`, `TCRT_LEFT:1`, `DIST_CM:20`, `MOTOR_LEFT:AVANZAR` y `BUZZER:ON`. El panel parsea esos mensajes y actualiza sensores, actuadores, procesos y registro de eventos.
+Tambien se implemento integracion opcional con Web Serial API. Si el navegador soporta Web Serial, el boton `Conectar Arduino` permite seleccionar el puerto del Arduino a 9600 baudios. El firmware final publica mensajes como `STATE:BUSCAR`, `STATE:ATACAR`, `TCRT_LEFT:1`, `DIST_CM:20`, `MOTOR_LEFT:AVANZAR` y `BUZZER:ON`. El panel parsea esos mensajes y actualiza sensores, actuadores, procesos y registro compacto de eventos.
 
-Descripcion visual del panel: en la parte superior se muestra accion actual, conexion, distancia y firmware detectado. A la izquierda aparece una lista de procesos con estados inactivo, activo, completado o alerta. Al centro se muestra un diagrama vivo del robot con Arduino Nano, Shield, sensores, motores, buzzer y alimentacion/GND comun. Debajo aparecen tarjetas para HC-SR04, TCRT5000, servos/motores y buzzer, junto con controles de modo demo y registro de eventos.
+El panel tambien incluye botones de pruebas rapidas. Si existe conexion Web Serial, envia comandos como `CMD:TEST_SENSORES`, `CMD:TEST_SERVOS`, `CMD:TEST_BUZZER`, `CMD:TEST_ULTRASONICO`, `CMD:DEMO_BORDE`, `CMD:DEMO_ATAQUE`, `CMD:DEMO_BUSCAR` y `CMD:STOP`. Si no existe conexion, los botones activan modo demo y actualizan visualmente el tablero.
 
-La utilidad principal durante la grabacion es que el panel permite explicar que sensor se activo, que accion tomo el robot y que proceso interno esta en curso, incluso cuando el movimiento fisico ocurre rapido o cuando se necesita repetir un caso para la camara.
+Descripcion visual del panel: en la parte superior se muestran conexion, firmware, distancia, accion y modo. La zona central contiene chips de procesos y tarjetas compactas para TCRT Left/Right/Back, HC-SR04, Servo Left, Servo Right, Buzzer y movimiento. Debajo se ubican los botones de pruebas rapidas y un log limitado a eventos recientes.
+
+La utilidad principal durante la grabacion es que toda la informacion importante cabe en la vista de la laptop, sin depender de scroll, y permite explicar que sensor se activo, que actuador responde y que movimiento hace el robot.
 
 ## 14. Algoritmos
 
@@ -165,7 +163,7 @@ Ver `simulation/casos_prueba.md`, `simulation/validacion_logica.md` y `validatio
 | Servo D9 aislado | Movimiento adelante y atras | 1700 us adelanta y 1300 us atrasa | Aprobado |
 | Servos D9/D10 conjunto | D9 avanza y D10 acompana sin quedarse quieto | D9 avanza, D10 acompana invertido por montaje, ninguno se queda quieto | Aprobado |
 | Firmware final | Arranque serial y logica cargada | Firmware final cargado en COM8 y arranque serial observado | Aprobado |
-| Panel web de monitoreo | Mostrar procesos, sensores, motores, buzzer y eventos | Panel actualizado con modo demo y Web Serial opcional | Aprobado |
+| Panel web compacto | Mostrar estado general, procesos, componentes, pruebas y eventos en una pantalla | Panel compacto actualizado con modo demo, pruebas rapidas y Web Serial opcional | Aprobado |
 | Robot fisico | Prototipo opera con sensores y actuadores finales | Estado reportado por usuario: robot fisico funcional | Aprobado |
 
 ## 19. Resultados

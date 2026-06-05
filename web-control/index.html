@@ -3,154 +3,136 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Robot Minisumo - Panel de Monitoreo</title>
-  <link rel="stylesheet" href="styles.css?v=monitor-demo">
+  <title>Robot Minisumo - Panel Compacto</title>
+  <link rel="stylesheet" href="styles.css?v=compact-video">
 </head>
 <body>
-  <main class="app-shell">
+  <main class="monitor">
     <header class="topbar">
-      <div>
-        <h1>Robot Minisumo - Panel de Monitoreo</h1>
-        <p>Arduino Nano + Shield | TCRT D3/D2/D0 | HC-SR04 D4/D5 | Buzzer D7 | SG90 D9/D10</p>
+      <div class="brand">
+        <h1>Robot Minisumo</h1>
+        <span>Panel video final</span>
       </div>
+
+      <section class="status-strip" aria-label="Estado general">
+        <div class="stat">
+          <span>Conexion</span>
+          <strong id="connectionState"><span id="connectionDot" class="dot"></span>Desconectado</strong>
+        </div>
+        <div class="stat">
+          <span>Firmware</span>
+          <strong id="firmwareState">No detectado</strong>
+        </div>
+        <div class="stat">
+          <span>Distancia</span>
+          <strong id="distanceValue">Sin eco</strong>
+        </div>
+        <div class="stat">
+          <span>Accion</span>
+          <strong id="currentAction">Inicializacion</strong>
+        </div>
+        <div class="stat">
+          <span>Modo</span>
+          <strong id="modeState">Real</strong>
+        </div>
+      </section>
+
       <div class="top-actions">
-        <button id="demoToggle" type="button" class="primary">Modo demo OFF</button>
         <button id="connectArduino" type="button">Conectar Arduino</button>
         <button id="disconnectArduino" type="button" disabled>Desconectar</button>
+        <button id="demoToggle" type="button" class="primary">Modo demo OFF</button>
       </div>
     </header>
 
-    <section id="demoNotice" class="notice hidden">
-      Modo demo: los estados son simulados desde el panel.
-    </section>
+    <div id="demoNotice" class="notice hidden">Modo demo: los estados son simulados desde el panel.</div>
 
-    <section class="hero-status">
-      <div>
-        <span class="eyebrow">Accion actual</span>
-        <strong id="currentAction">Inicializacion</strong>
-      </div>
-      <div>
-        <span class="eyebrow">Conexion</span>
-        <strong id="connectionState"><span id="connectionDot" class="dot"></span> Desconectado</strong>
-      </div>
-      <div>
-        <span class="eyebrow">Distancia</span>
-        <strong id="distanceValue">-- cm</strong>
-      </div>
-      <div>
-        <span class="eyebrow">Firmware</span>
-        <strong id="firmwareState">Esperando</strong>
-      </div>
-    </section>
-
-    <section class="dashboard">
-      <aside class="process-panel">
-        <h2>Procesos activos</h2>
-        <div id="processList" class="process-list"></div>
+    <section class="main-grid">
+      <aside class="panel process-panel">
+        <div class="section-title">
+          <h2>Proceso activo</h2>
+          <span id="processStatus">Inactivo</span>
+        </div>
+        <strong id="activeProcess" class="active-process">Inicializacion</strong>
+        <div id="processList" class="process-chips"></div>
       </aside>
 
-      <section class="robot-panel">
-        <div class="panel-heading">
-          <h2>Diagrama vivo del robot</h2>
-          <p id="modeDescription">Datos reales por Web Serial cuando se conecte Arduino; modo demo disponible para video.</p>
+      <section class="panel realtime-panel">
+        <div class="section-title">
+          <h2>Componentes en tiempo real</h2>
+          <span id="opponentState">Oponente: No</span>
         </div>
-        <div class="robot-stage">
-          <div class="robot-body">
-            <div id="nodeArduino" class="node arduino">Arduino Nano</div>
-            <div id="nodeShield" class="node shield">Expansion I/O Shield</div>
-            <div id="nodeHcsr04" class="node sensor ultrasonic">HC-SR04</div>
-            <div id="nodeTcrtLeft" class="node sensor tcrt left">TCRT Left</div>
-            <div id="nodeTcrtRight" class="node sensor tcrt right">TCRT Right</div>
-            <div id="nodeTcrtBack" class="node sensor tcrt back">TCRT Back</div>
-            <div id="nodeServoLeft" class="node motor motor-left">SG90 Left</div>
-            <div id="nodeServoRight" class="node motor motor-right">SG90 Right</div>
-            <div id="nodeBuzzer" class="node buzzer">KY-012</div>
-            <div id="nodePower" class="node power">VCC / GND comun</div>
-          </div>
-        </div>
-        <div class="diagram-links">
-          <a href="assets/diagrama_conexiones_final.png">Imagen final</a>
-          <a href="assets/diagrama_conexiones_final.pdf">PDF final</a>
+
+        <div class="component-grid">
+          <article id="cardTcrtLeft" class="component-card">
+            <span>TCRT Left</span>
+            <strong id="lineLeftState">LIBRE</strong>
+            <small>D3</small>
+          </article>
+          <article id="cardTcrtRight" class="component-card">
+            <span>TCRT Right</span>
+            <strong id="lineRightState">LIBRE</strong>
+            <small>D2</small>
+          </article>
+          <article id="cardTcrtBack" class="component-card">
+            <span>TCRT Back</span>
+            <strong id="lineBackState">LIBRE</strong>
+            <small>D0/RX</small>
+          </article>
+          <article id="cardUltrasonic" class="component-card">
+            <span>HC-SR04</span>
+            <strong id="ultrasonicStatus">SIN ECO</strong>
+            <small id="distanceDetail">--</small>
+          </article>
+          <article id="cardMotorLeft" class="component-card">
+            <span>Servo Left</span>
+            <strong id="motorLeftState">STOP</strong>
+            <small>D9</small>
+          </article>
+          <article id="cardMotorRight" class="component-card">
+            <span>Servo Right</span>
+            <strong id="motorRightState">STOP</strong>
+            <small>D10</small>
+          </article>
+          <article id="cardBuzzer" class="component-card">
+            <span>Buzzer</span>
+            <strong id="buzzerStatus">OFF</strong>
+            <small id="buzzerReason">Sin sonido</small>
+          </article>
+          <article id="cardMotion" class="component-card">
+            <span>Movimiento</span>
+            <strong id="motionState">DETENIDO</strong>
+            <small id="motionDetail">Motores quietos</small>
+          </article>
         </div>
       </section>
     </section>
 
-    <section class="component-grid">
-      <article id="cardUltrasonic" class="component-card">
-        <h2>HC-SR04 ultrasonico</h2>
-        <p id="ultrasonicStatus">Sin lectura</p>
-        <meter id="distanceMeter" min="0" max="120" low="35" high="80" optimum="20" value="0"></meter>
-        <dl>
-          <div><dt>Distancia</dt><dd id="distanceDetail">-- cm</dd></div>
-          <div><dt>Oponente</dt><dd id="opponentDetail">No confirmado</dd></div>
-        </dl>
-      </article>
-
-      <article id="cardLine" class="component-card">
-        <h2>Sensores TCRT5000</h2>
-        <div class="sensor-row">
-          <span id="lineLeft" class="sensor-pill">Left D3: --</span>
-          <span id="lineRight" class="sensor-pill">Right D2: --</span>
-          <span id="lineBack" class="sensor-pill">Back D0: --</span>
-        </div>
-        <p>D0 usa RX Serial; si interfiere con carga, desconectar TCRT Back temporalmente.</p>
-      </article>
-
-      <article id="cardMotors" class="component-card">
-        <h2>Servos / motores</h2>
-        <div class="motor-display">
-          <div id="motorLeft" class="motor-state">
-            <span class="wheel"></span>
-            <strong>Izquierdo</strong>
-            <em>Detenido</em>
-          </div>
-          <div id="motorRight" class="motor-state">
-            <span class="wheel"></span>
-            <strong>Derecho</strong>
-            <em>Detenido</em>
-          </div>
-        </div>
-      </article>
-
-      <article id="cardBuzzer" class="component-card">
-        <h2>Buzzer KY-012</h2>
-        <div id="buzzerIndicator" class="sound-indicator">
-          <span></span>
-          <strong id="buzzerStatus">Apagado</strong>
-        </div>
-        <p id="buzzerReason">Sin sonido activo</p>
-      </article>
-    </section>
-
-    <section class="demo-panel">
-      <div class="panel-heading">
-        <h2>Modo demo / grabacion</h2>
-        <p>Usa estos controles si no conectas Arduino o si quieres explicar un caso concreto frente a camara.</p>
+    <section class="panel quick-panel">
+      <div class="section-title">
+        <h2>Pruebas rapidas</h2>
+        <span id="commandState">Sin comando</span>
       </div>
-      <div class="demo-controls">
-        <button data-demo="EDGE_LEFT" type="button">Simular borde izquierdo</button>
-        <button data-demo="EDGE_RIGHT" type="button">Simular borde derecho</button>
-        <button data-demo="EDGE_BACK" type="button">Simular borde trasero</button>
-        <button data-demo="UNSTABLE_LINE" type="button">Simular lectura inestable</button>
-        <button data-demo="OPPONENT_CLOSE" type="button">Simular oponente cerca</button>
-        <button data-demo="ATTACK" type="button">Simular ataque</button>
-        <button data-demo="SEARCH" type="button">Simular busqueda</button>
-        <button data-demo="REVERSE" type="button">Simular retroceso</button>
-        <button data-demo="TURN_LEFT" type="button">Simular giro izquierdo</button>
-        <button data-demo="TURN_RIGHT" type="button">Simular giro derecho</button>
-        <button data-demo="BUZZER" type="button">Activar buzzer</button>
-        <button data-demo="STOP" type="button">Detener robot</button>
+      <div class="quick-actions">
+        <button data-test="TEST_SENSORES" type="button">Test sensores</button>
+        <button data-test="TEST_SERVOS" type="button">Test servos</button>
+        <button data-test="TEST_BUZZER" type="button">Test buzzer</button>
+        <button data-test="TEST_ULTRASONICO" type="button">Test ultrasonico</button>
+        <button data-test="DEMO_BORDE" type="button">Demo borde</button>
+        <button data-test="DEMO_ATAQUE" type="button">Demo ataque</button>
+        <button data-test="DEMO_BUSCAR" type="button">Demo buscar</button>
+        <button data-test="STOP" class="danger" type="button">Stop</button>
       </div>
     </section>
 
-    <section class="event-panel">
-      <div class="panel-heading">
-        <h2>Registro de eventos</h2>
-        <p id="lastUpdate">Sin eventos todavia</p>
+    <section class="panel log-panel">
+      <div class="section-title">
+        <h2>Eventos recientes</h2>
+        <span id="lastUpdate">Panel listo</span>
       </div>
-      <pre id="eventLog" aria-label="Registro de eventos del robot"></pre>
+      <pre id="eventLog" aria-label="Eventos recientes del robot"></pre>
     </section>
   </main>
-  <script src="app.js?v=monitor-demo"></script>
+
+  <script src="app.js?v=compact-video"></script>
 </body>
 </html>

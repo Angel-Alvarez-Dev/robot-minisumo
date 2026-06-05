@@ -37,6 +37,7 @@ int pulsoServoLeft = SERVO_STOP_US;
 int pulsoServoRight = SERVO_STOP_US;
 unsigned long ultimoPulsoServo = 0;
 unsigned long ultimoEstadoPanel = 0;
+unsigned long pausaPanelHasta = 0;
 LecturaLinea ultimaLinea = {false, false, false};
 long ultimaDistanciaCm = -1;
 bool ultimoOponenteDetectado = false;
@@ -60,8 +61,10 @@ void evitarBorde();
 void sonarBuzzer();
 void sonarBuzzer(unsigned int duracionMs);
 void pruebaSensores();
+void pruebaUltrasonico();
 void pruebaServos();
 void procesarComandoSerial();
+void procesarComandoPanel(String cmd);
 void actualizarServos();
 void emitirPulsoServo(byte pin, int anchoUs);
 void setServos(int leftUs, int rightUs);
@@ -69,6 +72,7 @@ void publicarEstadoPanel();
 
 void setup() {
   Serial.begin(9600);
+  Serial.setTimeout(20);
   configurarPines();
   detenerRobot();
   Serial.println(FIRMWARE_NAME);
@@ -90,6 +94,13 @@ void setup() {
 void loop() {
   actualizarServos();
   procesarComandoSerial();
+
+  if (millis() < pausaPanelHasta) {
+    estadoPanel = "DETENER";
+    detenerRobot();
+    publicarEstadoPanel();
+    return;
+  }
 
   estadoPanel = "READ_LINE";
   LecturaLinea linea = leerSensoresLinea();
@@ -262,6 +273,19 @@ void pruebaSensores() {
   publicarEstadoPanel();
 }
 
+void pruebaUltrasonico() {
+  long distancia = leerUltrasonico();
+  ultimaDistanciaCm = distancia;
+  ultimoOponenteDetectado = distancia > 0 && distancia <= DISTANCIA_ATAQUE_CM;
+  estadoPanel = "READ_ULTRA";
+  Serial.print("DIST_CM:");
+  Serial.println(distancia);
+  Serial.print("OPONENTE:");
+  Serial.println(ultimoOponenteDetectado ? 1 : 0);
+  ultimoEstadoPanel = 0;
+  publicarEstadoPanel();
+}
+
 void pruebaServos() {
   avanzar();
   delay(500);
@@ -274,7 +298,16 @@ void pruebaServos() {
 
 void procesarComandoSerial() {
   if (!Serial.available()) return;
-  char comando = Serial.read();
+  String cmd = Serial.readStringUntil('\n');
+  cmd.trim();
+  if (cmd.length() == 0) return;
+
+  if (cmd.startsWith("CMD:")) {
+    procesarComandoPanel(cmd);
+    return;
+  }
+
+  char comando = cmd.charAt(0);
   switch (comando) {
     case 's': pruebaSensores(); break;
     case 'v': estadoPanel = "INIT"; pruebaServos(); publicarEstadoPanel(); break;
@@ -282,6 +315,59 @@ void procesarComandoSerial() {
     case 'a': estadoPanel = "ATACAR"; avanzar(); publicarEstadoPanel(); delay(500); detenerRobot(); break;
     case 'd': estadoPanel = "DETENER"; detenerRobot(); publicarEstadoPanel(); break;
     default: break;
+  }
+}
+
+void procesarComandoPanel(String cmd) {
+  if (cmd == "CMD:TEST_SENSORES") {
+    estadoPanel = "READ_LINE";
+    pruebaSensores();
+  } else if (cmd == "CMD:TEST_SERVOS") {
+    estadoPanel = "INIT";
+    pruebaServos();
+    ultimoEstadoPanel = 0;
+    publicarEstadoPanel();
+  } else if (cmd == "CMD:TEST_BUZZER") {
+    estadoPanel = "BUZZER";
+    sonarBuzzer();
+  } else if (cmd == "CMD:TEST_ULTRASONICO") {
+    pruebaUltrasonico();
+  } else if (cmd == "CMD:DEMO_BORDE") {
+    estadoPanel = "EVITAR_BORDE";
+    retroceder();
+    ultimoEstadoPanel = 0;
+    publicarEstadoPanel();
+    sonarBuzzer(80);
+    delay(250);
+    detenerRobot();
+    pausaPanelHasta = millis() + 700;
+  } else if (cmd == "CMD:DEMO_ATAQUE") {
+    estadoPanel = "ATACAR";
+    avanzar();
+    motorLeftPanel = "ATAQUE";
+    motorRightPanel = "ATAQUE";
+    ultimoEstadoPanel = 0;
+    publicarEstadoPanel();
+    delay(250);
+    detenerRobot();
+    pausaPanelHasta = millis() + 700;
+  } else if (cmd == "CMD:DEMO_BUSCAR") {
+    estadoPanel = "BUSCAR";
+    girarDerecha();
+    ultimoEstadoPanel = 0;
+    publicarEstadoPanel();
+    delay(250);
+    detenerRobot();
+    pausaPanelHasta = millis() + 700;
+  } else if (cmd == "CMD:STOP") {
+    estadoPanel = "DETENER";
+    detenerRobot();
+    pausaPanelHasta = millis() + 3000;
+    ultimoEstadoPanel = 0;
+    publicarEstadoPanel();
+  } else {
+    Serial.print("UNKNOWN_CMD:");
+    Serial.println(cmd);
   }
 }
 

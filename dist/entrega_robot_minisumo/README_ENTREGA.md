@@ -14,6 +14,7 @@ El prototipo fisico del Robot Minisumo fue probado y se encuentra funcional.
 - `reporte_robot_minisumo.pdf`: PDF del reporte academico generado durante la consolidacion final.
 - `reporte_robot_minisumo.tex`: fuente LaTeX listo para compilar si se instala LaTeX.
 - `reporte_robot_minisumo.md`: fuente Markdown del reporte.
+- `README_PROYECTO.md`: README publico del repositorio.
 - `firmware/`: sketches de prueba y firmware final.
 - `hardware/kicad/`: proyecto KiCad y procedimiento de exportacion.
 - `simulation/`: casos de validacion logica.
