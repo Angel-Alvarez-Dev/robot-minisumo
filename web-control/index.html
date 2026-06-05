@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Robot Minisumo</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=arduino-status">
 </head>
 <body>
   <main>
@@ -13,6 +13,56 @@
       <p>Arduino Nano + Shield | TCRT D3/D2/D0 | HC-SR04 D4/D5 | Buzzer D7 | Servos D9/D10</p>
     </header>
     <section class="grid">
+      <article class="status-card">
+        <h2>Estado Arduino</h2>
+        <div class="status-line">
+          <span id="connectionDot" class="dot"></span>
+          <strong id="connectionState">Desconectado</strong>
+        </div>
+        <div class="status-grid">
+          <div>
+            <span>Puerto</span>
+            <strong id="portState">Sin seleccionar</strong>
+          </div>
+          <div>
+            <span>Baudios</span>
+            <strong>9600</strong>
+          </div>
+          <div>
+            <span>Ultimo dato</span>
+            <strong id="lastUpdate">--</strong>
+          </div>
+          <div>
+            <span>Firmware</span>
+            <strong id="firmwareState">Esperando</strong>
+          </div>
+        </div>
+        <div class="telemetry-grid">
+          <div>
+            <span>HC-SR04</span>
+            <strong id="arduinoDistance">-- cm</strong>
+          </div>
+          <div>
+            <span>TCRT Left D3</span>
+            <strong id="arduinoLeft">--</strong>
+          </div>
+          <div>
+            <span>TCRT Right D2</span>
+            <strong id="arduinoRight">--</strong>
+          </div>
+          <div>
+            <span>TCRT Back D0</span>
+            <strong id="arduinoBack">--</strong>
+          </div>
+        </div>
+        <div class="button-row">
+          <button id="connectArduino" type="button">Conectar</button>
+          <button id="disconnectArduino" type="button" disabled>Desconectar</button>
+          <button id="readArduino" type="button" disabled>Leer sensores</button>
+          <button id="autoArduino" type="button" disabled>Auto OFF</button>
+        </div>
+        <pre id="serialLog" aria-label="Registro serial"></pre>
+      </article>
       <article>
         <h2>Pinout</h2>
         <table id="pinout"></table>
@@ -21,9 +71,9 @@
         <h2>Sensores</h2>
         <label>Distancia HC-SR04 <input id="distance" type="range" min="2" max="120" value="48"></label>
         <output id="distanceOut">48 cm</output>
-        <label><input id="left" type="checkbox"> TCRT Left D2</label>
-        <label><input id="right" type="checkbox"> TCRT Right D3</label>
-        <label><input id="back" type="checkbox"> TCRT Back D6</label>
+        <label><input id="left" type="checkbox"> TCRT Left D3</label>
+        <label><input id="right" type="checkbox"> TCRT Right D2</label>
+        <label><input id="back" type="checkbox"> TCRT Back D0</label>
       </article>
       <article>
         <h2>Actuadores</h2>
@@ -38,13 +88,34 @@
         <h2>Decision</h2>
         <p id="decision">Buscando oponente.</p>
       </article>
+      <article>
+        <h2>Flujo logico</h2>
+        <ol>
+          <li>Leer TCRT Left, Right y Back.</li>
+          <li>Si hay borde, retroceder y girar.</li>
+          <li>Si no hay borde, medir HC-SR04.</li>
+          <li>Si hay oponente cercano, atacar.</li>
+          <li>Si no hay oponente, buscar girando.</li>
+        </ol>
+      </article>
+      <article>
+        <h2>Pruebas y resultados</h2>
+        <ul>
+          <li>Buzzer D7 aprobado.</li>
+          <li>HC-SR04 D4/D5 aprobado.</li>
+          <li>TCRT D3/D2/D0 aprobados.</li>
+          <li>SG90 D9/D10 aprobados.</li>
+          <li>Prototipo fisico funcional.</li>
+        </ul>
+        <p class="alert">D0 es RX Serial: desconectar TCRT Back durante carga si interfiere.</p>
+      </article>
     </section>
     <section>
       <h2>Diagrama de conexiones</h2>
-      <img src="../docs/assets/diagrama_conexiones.png" alt="Diagrama de conexiones">
+      <img src="assets/diagrama_conexiones_final.png" alt="Diagrama de conexiones final">
     </section>
   </main>
-  <script src="app.js"></script>
+  <script src="app.js?v=arduino-status"></script>
 </body>
 </html>
 

@@ -1,24 +1,26 @@
 # Changelog
 
-## 2026-06-05 - Consolidacion Para Entrega Y GitHub
+## 2026-06-05 - Finalizacion funcional Robot Minisumo
 
 ### Agregado
 
-- `.gitignore` para excluir caches Arduino, toolchains, builds, logs, temporales y archivos comprimidos.
-- Documentacion de pinout seguro sin D0/D1.
-- Firmware final y pruebas individuales en estructura solicitada.
-- KiCad documental, validacion y web-control.
+- BOM final desde Excel anexo.
+- Lista final de conexiones desde Excel e imagen final.
+- Imagen `diagrama_conexiones_final.png` en docs, hardware, report y web-control.
+- Auditoria final y checklist de entrega final.
+- Reporte academico en Markdown, LaTeX y PDF.
+- Panel web con estado Arduino por Web Serial API.
+- Evidencia final de pruebas fisicas.
 
 ### Cambiado
 
-- Se reemplaza la configuracion anterior basada en motores DC N20/driver por la configuracion actual con servomotores SG90.
-- Se reasignan los TCRT5000 que estaban en D0/D1 a D3 y D6 para reservar RX/TX Serial.
-- Pinout definitivo: TCRT D2/D3/D6, HC-SR04 D4/D5, buzzer D7, servos D9/D10.
+- Pinout final real: TCRT Left D3, Right D2, Back D0; HC-SR04 D4/D5; KY-012 D7; SG90 D9/D10.
+- README publico actualizado sin datos academicos personales.
+- Firmware final documenta calibracion SG90 y advertencia D0/RX.
+- Documentacion reemplaza antecedentes de motores DC N20 por version final con SG90.
 
-### Pendientes
+### Estado
 
-- Confirmar SG90 de rotacion continua.
-- Validar alimentacion de servos con hardware real.
-- Ejecutar ERC/exportaciones KiCad si hay `kicad-cli`.
-- Repositorio privado creado en GitHub y push inicial completado.
-
+- Prototipo fisico funcional.
+- KiCad documental actualizado.
+- ERC/exportaciones KiCad dependen de disponibilidad de `kicad-cli`.

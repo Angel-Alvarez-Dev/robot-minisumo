@@ -1,0 +1,17 @@
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.xlsx binary
+*.xls binary
+*.zip binary
+
+*.ino text
+*.md text
+*.tex text
+*.html text
+*.css text
+*.js text
+*.txt text
+*.kicad_sch text
+*.kicad_pro text

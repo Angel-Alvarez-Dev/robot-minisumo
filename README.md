@@ -1,24 +1,29 @@
 # Robot Minisumo
 
-Proyecto academico de Robot Minisumo basado en Arduino Nano montado sobre Arduino Nano Expansion I/O Shield.
+Robot Minisumo autonomo basado en Arduino Nano y Arduino Nano Expansion I/O Shield. El prototipo fisico fue probado y se encuentra funcional con sensores TCRT5000, HC-SR04, buzzer KY-012 y servomotores SG90.
 
-![Diagrama de conexiones](docs/assets/diagrama_conexiones.png)
+![Diagrama final de conexiones](docs/assets/diagrama_conexiones_final.png)
 
-## Hardware Actual
+## Estado del proyecto
+
+El prototipo fisico del Robot Minisumo fue probado y se encuentra funcional. El repositorio contiene firmware, documentacion, esquematicos KiCad, validacion logica y reporte academico en carpeta separada.
+
+## Componentes
 
 | Componente | Cantidad | Funcion |
-| --- | ---: | --- |
-| Arduino Nano V3 | 1 | Control principal |
-| Arduino Nano Expansion I/O Shield | 1 | Distribucion de pines, VCC y GND |
-| HC-SR04 | 1 | Deteccion frontal de oponente |
-| TCRT5000 | 3 | Deteccion de borde: Left, Right y Back |
-| SG90 RC 9g | 2 | Traccion solo si son de rotacion continua |
-| KY-012 | 1 | Indicador sonoro |
-| Porta pilas AA y pilas AA | 1 set | Alimentacion mediante la Shield |
+| --- | --- | --- |
+| Porta Pilas AA Con Plug Para 4/6 Pilas | 1 (EL DE 4) | Fuente portatil para alimentar el robot mediante la Shield. |
+| Paquete De 4 Pilas Alcalinas AA | 1.0 | Energia para el porta pilas AA. |
+| Sensor Seguidor de Linea TCRT5000 Optico Infrarrojo 3.3 V a 5 V | 3.0 | Deteccion de borde de dohyo con tres sensores Left, Right y Back. |
+| Sensor Ultrasónico HC-SR04 | 2.0 | Componente de soporte del robot. |
+| Buzzer Activo KY-012 | 2.0 | Indicador sonoro de arranque, ataque y evasion. |
+| Arduino Nano V3 + cable USB | 1.0 | Control principal de lectura de sensores y actuadores. |
+| Shield para Arduino Nano Expansion I/O | 1.0 | Control principal de lectura de sensores y actuadores. |
+| Servomotor SG90 RC 9g | 2.0 | Traccion diferencial del robot con SG90 confirmados funcionales. |
+| Llantas de plástico | 2.0 | Contacto mecanico de traccion para los servos. |
+| Cables Dupont Largos 20cm HH MH MM | 1-HH/1MH/1MM (uNO DE CADA UNO) | Cableado de senales, VCC y GND entre modulos y Shield. |
 
-## Pinout Definitivo
-
-Pinout real probado: Left D3, Right D2 y Back D0. D0 comparte RX Serial; si hay problemas de carga o monitor, desconectar temporalmente el TCRT Back.
+## Pinout final
 
 | Componente | Pin del componente | Pin Arduino/Shield | Senal |
 | --- | --- | --- | --- |
@@ -31,9 +36,14 @@ Pinout real probado: Left D3, Right D2 y Back D0. D0 comparte RX Serial; si hay 
 | SG90 Left | Signal | D9 | SERVO_LEFT |
 | SG90 Right | Signal | D10 | SERVO_RIGHT |
 
-Todos los modulos deben compartir GND comun. La Shield organiza conectores, pero no aumenta la capacidad de corriente del Arduino.
+## Advertencias tecnicas
 
-## Compilar Firmware
+- D0 corresponde a RX Serial del Arduino Nano. En el prototipo final se usa para `TCRT_BACK`; si interfiere con la carga de firmware o monitor serial, desconectar temporalmente el DO del sensor trasero.
+- Todos los modulos deben compartir GND comun.
+- La Shield de expansion organiza conexiones, pero no aumenta la capacidad de corriente del Arduino Nano.
+- Si los servos reinician el Arduino o vibran, usar alimentacion externa estable de 5 V para servos con GND comun.
+
+## Compilar firmware
 
 ```powershell
 $Cli = 'A:\robot-minisumo\tools\arduino-cli\arduino-cli.exe'
@@ -43,16 +53,20 @@ $Config = 'A:\robot-minisumo\.arduino-cli\arduino-cli.yaml'
 
 ## KiCad
 
-Abrir `hardware/kicad/robot_minisumo.kicad_pro`. El esquematico representa conexiones sobre la Shield; no se disena PCB personalizada.
+Abrir `hardware/kicad/robot_minisumo.kicad_pro`. El esquematico representa el montaje sobre Arduino Nano Expansion I/O Shield; no se disena PCB personalizada.
 
-## Herramienta Web
+## Documentacion
 
-Abrir `web-control/index.html`. La herramienta es visual y de apoyo; Web Serial queda como mejora futura opcional.
+- BOM final: `docs/bom_final.md`.
+- Conexiones finales: `docs/lista_conexiones_final.md`.
+- Algoritmos y pseudocodigo: `docs/algoritmos.md`, `docs/pseudocodigo.md`.
+- Validacion: `validation/` y `simulation/`.
+- Reporte academico: `report/`.
 
-## Pendientes Criticos
+## Herramienta web
 
-- PENDIENTE CRITICO: confirmar fisicamente si los SG90 son de rotacion continua.
-- Si los SG90 son estandar de posicion, no sirven como traccion continua del robot minisumo sin modificacion.
-- Verificar alimentacion de servos; si hay reinicios o movimientos erraticos, usar fuente externa de 5 V para servos con GND comun al Arduino.
-- Ejecutar validacion fisica de sensores y calibrar `LINE_ACTIVE_LOW`.
+Abrir `web-control/index.html` o servir el repositorio en `http://localhost:8080/web-control/`. Incluye panel visual, pinout, estado de sensores/actuadores y lectura Web Serial opcional para el firmware final.
 
+## Licencia
+
+Proyecto academico y tecnico. Agregar licencia explicita si se publicara para reutilizacion externa.

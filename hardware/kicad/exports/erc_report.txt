@@ -1,0 +1,9 @@
+ERC no ejecutado automaticamente.
+
+Motivo: kicad-cli no esta disponible en PATH durante la consolidacion final.
+
+Procedimiento manual:
+1. Abrir hardware/kicad/robot_minisumo.kicad_pro en KiCad.
+2. Abrir el esquematico robot_minisumo.kicad_sch.
+3. Ejecutar Inspeccion electrica / ERC.
+4. Exportar reporte, PDF y SVG a hardware/kicad/exports/.
