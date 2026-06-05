@@ -13,6 +13,8 @@
 - [x] Firmware final incluido.
 - [x] Firmware compilado en esta revision final.
 - [x] Pinout coincide con conexiones finales.
+- [x] Firmware final cargado en Arduino Nano.
+- [x] Version `1.0.0-funcional` confirmada por Serial Monitor.
 
 ## KiCad
 - [x] Esquematico actualizado.

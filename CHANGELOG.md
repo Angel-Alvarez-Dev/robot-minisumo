@@ -2,6 +2,12 @@
 
 ## 2026-06-05 - Finalizacion funcional Robot Minisumo
 
+### Verificado posteriormente
+
+- Se agrego identificacion de firmware final: `Robot Minisumo Final`, `1.0.0-funcional`, `FUNCIONAL_PROBADO`.
+- Se compilo y cargo `firmware/robot_minisumo_final/robot_minisumo_final.ino` en Arduino Nano por `COM8`.
+- La version cargada fue confirmada por Serial Monitor.
+
 ### Agregado
 
 - BOM final desde Excel anexo.

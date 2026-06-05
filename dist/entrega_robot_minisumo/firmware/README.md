@@ -1,5 +1,21 @@
 # Firmware
 
+## Version funcional cargada
+
+El Arduino Nano tiene cargada y confirmada por Serial la version funcional del firmware final:
+
+```text
+Robot Minisumo Final
+1.0.0-funcional
+FUNCIONAL_PROBADO
+```
+
+Archivo final: `firmware/robot_minisumo_final/robot_minisumo_final.ino`.
+
+Puerto confirmado: `COM8`.
+
+FQBN usado para carga: `arduino:avr:nano`.
+
 ## Pinout final
 
 | Senal | Pin |

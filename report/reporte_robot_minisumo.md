@@ -130,6 +130,14 @@ Ver `simulation/casos_prueba.md`, `simulation/validacion_logica.md` y `validatio
 
 El prototipo fisico quedo funcional. Se confirmaron buzzer, HC-SR04, tres TCRT5000 y servos SG90. El pinout final real quedo documentado y el firmware final se cargo en COM8.
 
+La version funcional cargada fue confirmada por Serial Monitor:
+
+```text
+Robot Minisumo Final
+1.0.0-funcional
+FUNCIONAL_PROBADO
+```
+
 ## 19. Conclusiones
 
 El proyecto final integra hardware, firmware y documentacion de forma coherente con el robot funcional real. La principal restriccion tecnica es el uso de D0 para el sensor trasero, debido a que comparte RX Serial. La recomendacion es desconectar temporalmente ese sensor durante cargas de firmware o futuras depuraciones seriales.

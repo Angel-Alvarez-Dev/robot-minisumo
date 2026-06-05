@@ -6,7 +6,7 @@ Robot Minisumo autonomo basado en Arduino Nano y Arduino Nano Expansion I/O Shie
 
 ## Estado del proyecto
 
-El prototipo fisico del Robot Minisumo fue probado y se encuentra funcional. El repositorio contiene firmware, documentacion, esquematicos KiCad, validacion logica y reporte academico en carpeta separada.
+El prototipo fisico del Robot Minisumo fue probado y se encuentra funcional. El Arduino Nano tiene cargada y confirmada por Serial la version funcional `1.0.0-funcional` del firmware final. El repositorio contiene firmware, documentacion, esquematicos KiCad, validacion logica y reporte academico en carpeta separada.
 
 ## Componentes
 
@@ -50,6 +50,20 @@ $Cli = 'A:\robot-minisumo\tools\arduino-cli\arduino-cli.exe'
 $Config = 'A:\robot-minisumo\.arduino-cli\arduino-cli.yaml'
 & $Cli --config-file $Config compile --fqbn arduino:avr:nano firmware\robot_minisumo_final
 ```
+
+## Firmware cargado
+
+Firmware final: `firmware/robot_minisumo_final/robot_minisumo_final.ino`.
+
+Version confirmada desde Serial Monitor:
+
+```text
+Robot Minisumo Final
+1.0.0-funcional
+FUNCIONAL_PROBADO
+```
+
+La carga fue confirmada en `COM8` usando `arduino:avr:nano`.
 
 ## KiCad
 

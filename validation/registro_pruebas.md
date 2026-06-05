@@ -12,6 +12,7 @@ Fecha: 2026-06-05
 | Servo D9 aislado | Movimiento adelante y atras | 1700 us adelanta y 1300 us atrasa | Aprobado |
 | Servos D9/D10 conjunto | D9 avanza y D10 acompana sin quedarse quieto | D9 avanza, D10 acompana invertido por montaje, ninguno se queda quieto | Aprobado |
 | Firmware final | Arranque serial y logica cargada | Firmware final cargado en COM8 y arranque serial observado | Aprobado |
+| Version firmware final | Serial debe reportar nombre, version y estado | `Robot Minisumo Final`, `1.0.0-funcional`, `FUNCIONAL_PROBADO` capturados desde COM8 | Aprobado |
 | Robot fisico | Prototipo opera con sensores y actuadores finales | Estado reportado por usuario: robot fisico funcional | Aprobado |
 
 ## Evidencia textual
@@ -20,3 +21,4 @@ Fecha: 2026-06-05
 - Usuario confirmo que D9 avanza y D10 acompana; D10 gira al reves por montaje y ninguno se queda quieto.
 - Usuario confirmo calibracion D9: 1700 us adelanta y 1300 us atrasa.
 - Firmware final se cargo en COM8 y mostro arranque serial correcto.
+- Version final confirmada por Serial: `1.0.0-funcional`.

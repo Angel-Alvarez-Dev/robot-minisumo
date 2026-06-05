@@ -1,3 +1,7 @@
+#define FIRMWARE_NAME "Robot Minisumo Final"
+#define FIRMWARE_VERSION "1.0.0-funcional"
+#define FIRMWARE_STATUS "FUNCIONAL_PROBADO"
+
 const byte PIN_TCRT_LEFT = 3;
 const byte PIN_TCRT_RIGHT = 2;
 const byte PIN_TCRT_BACK = 0;
@@ -57,6 +61,9 @@ void setup() {
   Serial.begin(9600);
   configurarPines();
   detenerRobot();
+  Serial.println(FIRMWARE_NAME);
+  Serial.println(FIRMWARE_VERSION);
+  Serial.println(FIRMWARE_STATUS);
   Serial.println("Robot Minisumo - Pinout real: TCRT L/R/B D3/D2/D0");
   Serial.println("Prototipo fisico funcional: SG90 D9/D10 y sensores finales confirmados.");
   Serial.println("Advertencia: TCRT Back usa D0/RX; desconectar para cargar firmware si es necesario.");
