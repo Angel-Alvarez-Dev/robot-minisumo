@@ -73,6 +73,8 @@ Advertencia: D0 y D1 corresponden a RX/TX del Arduino Nano. El prototipo final u
 
 ![Diagrama final de conexiones](assets/diagrama_conexiones_final.png)
 
+Version PDF del diagrama final: `assets/diagrama_conexiones_final.pdf`.
+
 ## 10. Esquematicos del circuito
 
 El proyecto KiCad esta en `hardware/kicad/robot_minisumo.kicad_pro`. El esquematico es documental y representa el montaje real sobre Shield, con GND comun, VCC_5V para sensores/buzzer y alimentacion estable para servos.

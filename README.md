@@ -4,6 +4,8 @@ Robot Minisumo autonomo basado en Arduino Nano y Arduino Nano Expansion I/O Shie
 
 ![Diagrama final de conexiones](docs/assets/diagrama_conexiones_final.png)
 
+PDF del diagrama final: [docs/assets/diagrama_conexiones_final.pdf](docs/assets/diagrama_conexiones_final.pdf)
+
 ## Estado del proyecto
 
 El prototipo fisico del Robot Minisumo fue probado y se encuentra funcional. El Arduino Nano tiene cargada y confirmada por Serial la version funcional `1.0.0-funcional` del firmware final. El repositorio contiene firmware, documentacion, esquematicos KiCad, validacion logica y reporte academico en carpeta separada.

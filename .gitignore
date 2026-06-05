@@ -25,6 +25,9 @@ build/
 *.kicad_sch-bak
 *.kicad_pcb-bak
 fp-info-cache
+*.lck
+*#auto_saved_files#*
+_autosave-*
 
 # LaTeX
 *.aux

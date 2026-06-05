@@ -2,6 +2,8 @@
 
 Fuente valida: `Conexiones_Robot_Minisumo.xlsx` anexo e imagen final `diagrama_conexiones_final.png`.
 
+Version PDF del diagrama: `docs/assets/diagrama_conexiones_final.pdf`.
+
 Pinout final probado:
 
 - TCRT5000 Left: D3.
