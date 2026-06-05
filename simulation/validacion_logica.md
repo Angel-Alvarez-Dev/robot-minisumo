@@ -7,3 +7,4 @@ Prioridad de comportamiento:
 3. Si no hay borde ni oponente, buscar.
 
 El pinout evita D0/D1 para no interferir con Serial Monitor.
+

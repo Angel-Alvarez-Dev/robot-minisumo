@@ -66,9 +66,9 @@ Ver `docs/bom_actualizada.md`.
 
 | Componente | Senal | Pin |
 | --- | --- | --- |
-| TCRT5000 Left | DO | D2 |
-| TCRT5000 Right | DO | D3 |
-| TCRT5000 Back | DO | D6 |
+| TCRT5000 Left | DO | D3 |
+| TCRT5000 Right | DO | D2 |
+| TCRT5000 Back | DO | D0 |
 | HC-SR04 | Trig | D4 |
 | HC-SR04 | Echo | D5 |
 | KY-012 | Signal | D7 |
@@ -125,7 +125,7 @@ Ver `simulation/casos_prueba.md` y `validation/registro_pruebas.md`.
 - PENDIENTE CRITICO: confirmar fisicamente si los SG90 son de rotacion continua.
 - Si los SG90 son estandar de posicion, no sirven como traccion continua sin modificacion.
 - Los servos SG90 pueden consumir mas corriente de la que el Arduino Nano entrega de forma estable.
-- D0/D1 quedan reservados para Serial; no usarlos en sensores.
+- D0 se usa por TCRT Back y D1 queda libre para TX Serial.
 
 ## 19. Resultados Esperados
 
@@ -156,3 +156,4 @@ El proyecto queda consolidado alrededor de Arduino Nano + Shield y servos SG90, 
 | KiCad | `hardware/kicad/` | Completo, ERC pendiente |
 | Validacion | `validation/` | Completo documental |
 | Web | `web-control/` | Completo |
+

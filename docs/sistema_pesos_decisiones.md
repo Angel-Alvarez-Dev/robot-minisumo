@@ -25,3 +25,4 @@
 - PENDIENTE CRITICO: confirmar fisicamente si los SG90 son de rotacion continua.
 - Si los SG90 son estandar de posicion, no sirven como traccion continua del robot minisumo sin modificacion.
 - Los servos SG90 pueden consumir mas corriente de la que el Arduino Nano puede entregar de forma estable.
+

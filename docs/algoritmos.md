@@ -13,7 +13,7 @@
 
 ## Deteccion De Borde
 
-Los TCRT5000 se usan por salida digital `DO`: Left en D2, Right en D3 y Back en D6. D0/D1 quedan reservados para Serial.
+Los TCRT5000 se usan por salida digital `DO`: Left en D3, Right en D2 y Back en D0. D0 se usa por TCRT Back y D1 queda libre para TX Serial.
 
 ## Medicion De Distancia
 
@@ -32,3 +32,4 @@ distancia_cm = duracion_echo_us * 0.0343 / 2
 | Girar derecha | 1700 us | 1700 us |
 
 Los valores deben calibrarse con hardware real.
+

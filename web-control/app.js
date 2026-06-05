@@ -1,7 +1,7 @@
 const pinout = [
-  ["TCRT5000 Left", "D2", "TCRT_LEFT"],
-  ["TCRT5000 Right", "D3", "TCRT_RIGHT"],
-  ["TCRT5000 Back", "D6", "TCRT_BACK"],
+  ["TCRT5000 Left", "D3", "TCRT_LEFT"],
+  ["TCRT5000 Right", "D2", "TCRT_RIGHT"],
+  ["TCRT5000 Back", "D0", "TCRT_BACK"],
   ["HC-SR04 Trig", "D4", "TRIG_HCSR04"],
   ["HC-SR04 Echo", "D5", "ECHO_HCSR04"],
   ["KY-012", "D7", "BUZZER_SIG"],
@@ -39,3 +39,4 @@ document.querySelectorAll("button").forEach((button) => button.addEventListener(
   }
 }));
 render();
+

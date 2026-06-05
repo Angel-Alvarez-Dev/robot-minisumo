@@ -1,6 +1,6 @@
-const byte PIN_TCRT_LEFT = 2;
-const byte PIN_TCRT_RIGHT = 3;
-const byte PIN_TCRT_BACK = 6;
+const byte PIN_TCRT_LEFT = 3;
+const byte PIN_TCRT_RIGHT = 2;
+const byte PIN_TCRT_BACK = 0;
 const byte PIN_TRIG_HCSR04 = 4;
 const byte PIN_ECHO_HCSR04 = 5;
 const byte PIN_BUZZER = 7;
@@ -53,7 +53,7 @@ void setup() {
   Serial.begin(9600);
   configurarPines();
   detenerRobot();
-  Serial.println("Robot Minisumo - Pinout seguro sin D0/D1");
+  Serial.println("Robot Minisumo - Pinout real: TCRT L/R/B D3/D2/D0");
   Serial.println("PENDIENTE CRITICO: confirmar SG90 de rotacion continua.");
   sonarBuzzer(120);
   delay(TIEMPO_ARRANQUE_MS);
@@ -227,3 +227,4 @@ void emitirPulsoServo(byte pin, int anchoUs) {
   delayMicroseconds(anchoUs);
   digitalWrite(pin, LOW);
 }
+

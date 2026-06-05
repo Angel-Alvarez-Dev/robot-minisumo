@@ -18,13 +18,13 @@ Proyecto academico de Robot Minisumo basado en Arduino Nano montado sobre Arduin
 
 ## Pinout Definitivo
 
-D0/D1 quedan reservados para carga de firmware y Serial Monitor. La tabla previa usaba D0/D1 para dos TCRT5000; se reasignaron a pines libres por seguridad y mantenimiento.
+Pinout real probado: Left D3, Right D2 y Back D0. D0 comparte RX Serial; si hay problemas de carga o monitor, desconectar temporalmente el TCRT Back.
 
 | Componente | Pin del componente | Pin Arduino/Shield | Senal |
 | --- | --- | --- | --- |
-| TCRT5000 Left | DO | D2 | TCRT_LEFT |
-| TCRT5000 Right | DO | D3 | TCRT_RIGHT |
-| TCRT5000 Back | DO | D6 | TCRT_BACK |
+| TCRT5000 Left | DO | D3 | TCRT_LEFT |
+| TCRT5000 Right | DO | D2 | TCRT_RIGHT |
+| TCRT5000 Back | DO | D0 | TCRT_BACK |
 | HC-SR04 | Trig | D4 | TRIG_HCSR04 |
 | HC-SR04 | Echo | D5 | ECHO_HCSR04 |
 | KY-012 | S | D7 | BUZZER_SIG |
@@ -55,3 +55,4 @@ Abrir `web-control/index.html`. La herramienta es visual y de apoyo; Web Serial 
 - Si los SG90 son estandar de posicion, no sirven como traccion continua del robot minisumo sin modificacion.
 - Verificar alimentacion de servos; si hay reinicios o movimientos erraticos, usar fuente externa de 5 V para servos con GND comun al Arduino.
 - Ejecutar validacion fisica de sensores y calibrar `LINE_ACTIVE_LOW`.
+

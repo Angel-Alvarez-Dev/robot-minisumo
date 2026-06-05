@@ -6,13 +6,13 @@ Fuente: BOM/tabla de conexiones actualizada e imagen del diagrama. Se aplico una
 | --- | --- | --- | --- | --- | --- |
 | Sensor TCRT5000 Left | GND | GND | GND | 0 V | Tierra comun |
 | Sensor TCRT5000 Left | VCC | VCC | VCC_5V | 3.3 V a 5 V | Alimentado desde Shield |
-| Sensor TCRT5000 Left | DO | D2 | TCRT_LEFT | Nivel logico | Salida digital |
+| Sensor TCRT5000 Left | DO | D3 | TCRT_LEFT | Nivel logico | Salida digital |
 | Sensor TCRT5000 Right | GND | GND | GND | 0 V | Tierra comun |
 | Sensor TCRT5000 Right | VCC | VCC | VCC_5V | 3.3 V a 5 V | Alimentado desde Shield |
-| Sensor TCRT5000 Right | DO | D3 | TCRT_RIGHT | Nivel logico | Reasignado desde D1 para liberar TX |
+| Sensor TCRT5000 Right | DO | D2 | TCRT_RIGHT | Nivel logico | Reasignado desde D1 para liberar TX |
 | Sensor TCRT5000 Back | GND | GND | GND | 0 V | Tierra comun |
 | Sensor TCRT5000 Back | VCC | VCC | VCC_5V | 3.3 V a 5 V | Alimentado desde Shield |
-| Sensor TCRT5000 Back | DO | D6 | TCRT_BACK | Nivel logico | Reasignado desde D0 para liberar RX |
+| Sensor TCRT5000 Back | DO | D0 | TCRT_BACK | Nivel logico | Reasignado desde D0 para liberar RX |
 | Sensor HC-SR04 | GND | GND | GND | 0 V | Tierra comun |
 | Sensor HC-SR04 | VCC | VCC | VCC_5V | 5 V | Modulo ultrasonico frontal |
 | Sensor HC-SR04 | Trig | D4 | TRIG_HCSR04 | 5 V logico | Pulso de disparo |
@@ -29,6 +29,7 @@ Fuente: BOM/tabla de conexiones actualizada e imagen del diagrama. Se aplico una
 
 ## Validacion
 
-- D0/D1 quedan reservados para carga de firmware y Serial Monitor.
+- D0 se usa por TCRT Back y D1 queda libre para TX Serial.
 - Todos los modulos comparten GND comun.
 - Los servos pueden requerir fuente externa de 5 V con GND comun.
+
