@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Robot Sumo Control</title>
+    <style>
+      :root { color-scheme: light; --bg:#f5f7fb; --card:#fff; --ink:#16202c; --muted:#65758b; --line:#d8e0ea; --blue:#1d5fd3; --green:#14804f; --red:#c93434; --amber:#c78312; }
+      * { box-sizing: border-box; }
+      body { margin:0; background:var(--bg); color:var(--ink); font-family:Segoe UI, Arial, sans-serif; }
+      main { width:min(1180px, calc(100% - 28px)); margin:22px auto; }
+      header { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:16px; }
+      h1, h2, p { margin:0; } p { color:var(--muted); margin-top:4px; }
+      button { border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:8px; min-height:42px; padding:0 14px; font:inherit; font-weight:700; cursor:pointer; }
+      button:disabled { opacity:.45; cursor:not-allowed; }
+      .connection { display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap; }
+      .dot { width:12px; height:12px; border-radius:50%; background:var(--red); box-shadow:0 0 0 4px rgba(201,52,52,.12); }
+      .dot.on { background:var(--green); box-shadow:0 0 0 4px rgba(20,128,79,.14); }
+      .grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+      section { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:18px; }
+      .pad { width:min(100%, 320px); margin:12px auto 18px; display:grid; grid-template-columns:repeat(3, 96px); grid-template-rows:repeat(3, 72px); gap:8px; justify-content:center; }
+      .direction { background:#edf4ff; border-color:#b8cdf8; color:#164393; font-size:28px; }
+      .stop { background:#fff0f0; border-color:#edb7b7; color:var(--red); }
+      .ghost { visibility:hidden; }
+      .row { display:flex; gap:10px; margin-bottom:16px; }
+      .row button { flex:1; }
+      #enableBtn { background:#ebf9f1; border-color:#a9d9bc; color:#106c41; }
+      #killBtn { background:#fff4df; border-color:#ecc278; color:#83520b; }
+      .speed { display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; }
+      .speed input { grid-column:1 / -1; width:100%; }
+      .metrics { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; }
+      .metric, .sensor { border:1px solid var(--line); border-radius:8px; padding:14px; min-height:82px; }
+      .metric span { display:block; color:var(--muted); font-size:13px; margin-bottom:8px; }
+      .metric strong { font-size:24px; overflow-wrap:anywhere; }
+      .sensor { display:flex; align-items:center; gap:10px; margin-top:12px; font-weight:700; min-height:0; }
+      .sensor i { width:16px; height:16px; border-radius:50%; background:#b6c0cc; display:block; }
+      .sensor.active i { background:var(--amber); box-shadow:0 0 0 4px rgba(199,131,18,.16); }
+      .wide { grid-column:1 / -1; }
+      pre { height:180px; overflow:auto; margin:0; background:#101820; color:#dbeafe; border-radius:8px; padding:14px; line-height:1.45; }
+      #readme { line-height:1.55; }
+      #readme h1, #readme h2, #readme h3 { margin:16px 0 8px; }
+      #readme ul { padding-left:22px; }
+      #readme code { background:#eef2f7; padding:2px 5px; border-radius:5px; }
+      @media (max-width:820px) { header, .grid { display:block; } section { margin-bottom:16px; } .connection { justify-content:flex-start; margin-top:12px; } .pad { grid-template-columns:repeat(3, minmax(72px, 92px)); } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <h1>Robot Sumo</h1>
+          <p>Control manual y monitoreo por USB Serial</p>
+        </div>
+        <div class="connection">
+          <span id="statusDot" class="dot"></span>
+          <span id="connectionText">Desconectado</span>
+          <button id="connectBtn" type="button">Conectar</button>
+          <button id="disconnectBtn" type="button" disabled>Desconectar</button>
+        </div>
+      </header>
+
+      <div class="grid">
+        <section>
+          <h2>Control direccional</h2>
+          <div class="pad">
+            <button class="ghost" type="button" disabled></button>
+            <button class="direction" data-command="F" type="button">↑</button>
+            <button class="ghost" type="button" disabled></button>
+            <button class="direction" data-command="L" type="button">←</button>
+            <button class="stop" data-command="S" type="button">STOP</button>
+            <button class="direction" data-command="R" type="button">→</button>
+            <button class="ghost" type="button" disabled></button>
+            <button class="direction" data-command="B" type="button">↓</button>
+            <button class="ghost" type="button" disabled></button>
+          </div>
+          <div class="row">
+            <button id="enableBtn" type="button">Habilitar movimiento</button>
+            <button id="killBtn" type="button">Parada segura</button>
+          </div>
+          <label class="speed">
+            <span>Velocidad</span>
+            <strong id="speedValue">0</strong>
+            <input id="speedSlider" type="range" min="0" max="255" value="0">
+          </label>
+        </section>
+
+        <section>
+          <h2>Monitoreo</h2>
+          <div class="metrics">
+            <div class="metric"><span>Movimiento</span><strong id="enabledValue">-</strong></div>
+            <div class="metric"><span>Comando</span><strong id="cmdValue">-</strong></div>
+            <div class="metric"><span>Distancia</span><strong id="distanceValue">-</strong></div>
+            <div class="metric"><span>Velocidad</span><strong id="telemetrySpeed">-</strong></div>
+          </div>
+          <div id="lineLeft" class="sensor"><i></i> Borde izquierdo</div>
+          <div id="lineRight" class="sensor"><i></i> Borde derecho</div>
+          <div id="lineBack" class="sensor"><i></i> Borde trasero</div>
+          <div id="opponent" class="sensor"><i></i> Oponente detectado</div>
+        </section>
+
+        <section class="wide">
+          <h2>Consola Serial</h2>
+          <pre id="serialLog"></pre>
+        </section>
+
+        <section class="wide">
+          <h2>README del proyecto</h2>
+          <div id="readme">Cargando README...</div>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      const BAUD_RATE = 9600;
+      const MAX_LOG_LINES = 120;
+      const enc = new TextEncoder();
+      let port, reader, writer, pipeClosed, readBuffer = "", keepReading = false, speedTimer;
+
+      const $ = (id) => document.getElementById(id);
+      const logEl = $("serialLog");
+      const controls = () => document.querySelectorAll("[data-command], #enableBtn, #killBtn, #speedSlider");
+
+      function log(message) {
+        const stamp = new Date().toLocaleTimeString();
+        logEl.textContent += `[${stamp}] ${message}\n`;
+        const lines = logEl.textContent.split("\n");
+        if (lines.length > MAX_LOG_LINES) logEl.textContent = lines.slice(-MAX_LOG_LINES).join("\n");
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+
+      function setConnected(value) {
+        $("statusDot").classList.toggle("on", value);
+        $("connectionText").textContent = value ? "Conectado" : "Desconectado";
+        $("connectBtn").disabled = value;
+        $("disconnectBtn").disabled = !value;
+        controls().forEach((el) => el.disabled = !value);
+      }
+
+      async function send(command) {
+        if (!writer) return log("Sin conexion Serial");
+        await writer.write(enc.encode(`${command}\n`));
+        log(`>> ${command}`);
+      }
+
+      function handleLine(line) {
+        if (!line) return;
+        if (!line.startsWith("TEL ")) return log(`<< ${line}`);
+        try {
+          const data = JSON.parse(line.slice(4));
+          $("enabledValue").textContent = data.enabled ? "ON" : "OFF";
+          $("cmdValue").textContent = data.cmd ?? "-";
+          $("telemetrySpeed").textContent = data.speed ?? "-";
+          $("distanceValue").textContent = data.distanceCm === 999 ? "Sin eco" : `${data.distanceCm} cm`;
+          $("lineLeft").classList.toggle("active", Boolean(data.lineLeft));
+          $("lineRight").classList.toggle("active", Boolean(data.lineRight));
+          $("lineBack").classList.toggle("active", Boolean(data.lineBack ?? data.rearEdge));
+          $("opponent").classList.toggle("active", Boolean(data.opponent));
+        } catch (err) {
+          log(`Error TEL: ${err.message}`);
+        }
+      }
+
+      async function readLoop() {
+        const decoder = new TextDecoderStream();
+        pipeClosed = port.readable.pipeTo(decoder.writable).catch(() => {});
+        const activeReader = decoder.readable.getReader();
+        reader = activeReader;
+        keepReading = true;
+        try {
+          while (keepReading) {
+            const { value, done } = await activeReader.read();
+            if (done) break;
+            readBuffer += value;
+            const lines = readBuffer.split(/\r?\n/);
+            readBuffer = lines.pop() || "";
+            lines.forEach((line) => handleLine(line.trim()));
+          }
+        } finally {
+          activeReader.releaseLock();
+          if (reader === activeReader) reader = undefined;
+        }
+      }
+
+      async function connect() {
+        if (!("serial" in navigator)) return log("Web Serial API requiere Chrome o Edge en localhost.");
+        port = await navigator.serial.requestPort();
+        await port.open({ baudRate: BAUD_RATE });
+        writer = port.writable.getWriter();
+        setConnected(true);
+        readLoop().catch((err) => log(`Lectura detenida: ${err.message}`));
+        await send(`SPEED ${$("speedSlider").value}`);
+        await send("PING");
+      }
+
+      async function disconnect() {
+        try {
+          if (writer) {
+            await send("S");
+            await send("KILL");
+            writer.releaseLock();
+            writer = undefined;
+          }
+          keepReading = false;
+          if (reader) await reader.cancel();
+          if (pipeClosed) await pipeClosed;
+          if (port) await port.close();
+        } finally {
+          port = undefined;
+          pipeClosed = undefined;
+          setConnected(false);
+          log("Desconectado");
+        }
+      }
+
+      function renderMarkdown(md) {
+        const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;" }[c]));
+        return md.split(/\r?\n/).map((line) => {
+          if (line.startsWith("### ")) return `<h3>${esc(line.slice(4))}</h3>`;
+          if (line.startsWith("## ")) return `<h2>${esc(line.slice(3))}</h2>`;
+          if (line.startsWith("# ")) return `<h1>${esc(line.slice(2))}</h1>`;
+          if (line.startsWith("- ")) return `<li>${esc(line.slice(2))}</li>`;
+          if (!line.trim()) return "";
+          return `<p>${esc(line).replace(/`([^`]+)`/g, "<code>$1</code>")}</p>`;
+        }).join("\n").replace(/(<li>.*<\/li>\n?)+/g, (m) => `<ul>${m}</ul>`);
+      }
+
+      async function loadReadme() {
+        try {
+          const res = await fetch("../README.md", { cache: "no-store" });
+          $("readme").innerHTML = renderMarkdown(await res.text());
+        } catch {
+          $("readme").textContent = "No se pudo cargar README.md desde localhost.";
+        }
+      }
+
+      $("connectBtn").addEventListener("click", () => connect().catch((err) => log(err.message)));
+      $("disconnectBtn").addEventListener("click", () => disconnect().catch((err) => log(err.message)));
+      $("enableBtn").addEventListener("click", () => send("ENABLE"));
+      $("killBtn").addEventListener("click", () => send("KILL"));
+      document.querySelectorAll("[data-command]").forEach((btn) => btn.addEventListener("click", () => send(btn.dataset.command)));
+      $("speedSlider").addEventListener("input", () => {
+        $("speedValue").textContent = $("speedSlider").value;
+        clearTimeout(speedTimer);
+        speedTimer = setTimeout(() => send(`SPEED ${$("speedSlider").value}`), 120);
+      });
+      window.addEventListener("keydown", (event) => {
+        const map = { ArrowUp:"F", ArrowDown:"B", ArrowLeft:"L", ArrowRight:"R", " ":"S" };
+        if (map[event.key]) { event.preventDefault(); send(map[event.key]); }
+      });
+
+      setConnected(false);
+      loadReadme();
+    </script>
+  </body>
+</html>

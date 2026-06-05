@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Robot Minisumo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Robot Minisumo</h1>
+      <p>Arduino Nano + Shield | TCRT D2/D3/D6 | HC-SR04 D4/D5 | Buzzer D7 | Servos D9/D10</p>
+    </header>
+    <section class="grid">
+      <article>
+        <h2>Pinout</h2>
+        <table id="pinout"></table>
+      </article>
+      <article>
+        <h2>Sensores</h2>
+        <label>Distancia HC-SR04 <input id="distance" type="range" min="2" max="120" value="48"></label>
+        <output id="distanceOut">48 cm</output>
+        <label><input id="left" type="checkbox"> TCRT Left D2</label>
+        <label><input id="right" type="checkbox"> TCRT Right D3</label>
+        <label><input id="back" type="checkbox"> TCRT Back D6</label>
+      </article>
+      <article>
+        <h2>Actuadores</h2>
+        <p id="servoState">Servos detenidos: 1500 us</p>
+        <p id="buzzerState">Buzzer OFF</p>
+        <button data-action="forward">Avanzar</button>
+        <button data-action="reverse">Retroceder</button>
+        <button data-action="stop">Detener</button>
+        <button data-action="buzzer">Buzzer</button>
+      </article>
+      <article>
+        <h2>Decision</h2>
+        <p id="decision">Buscando oponente.</p>
+      </article>
+    </section>
+    <section>
+      <h2>Diagrama de conexiones</h2>
+      <img src="../docs/assets/diagrama_conexiones.png" alt="Diagrama de conexiones">
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
