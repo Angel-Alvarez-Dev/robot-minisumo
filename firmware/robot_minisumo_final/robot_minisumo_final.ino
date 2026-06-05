@@ -18,6 +18,7 @@ const byte PIN_SERVO_RIGHT = 10;
 const bool LINE_ACTIVE_LOW = true;
 const unsigned int DISTANCIA_ATAQUE_CM = 35;
 const unsigned int TIEMPO_ARRANQUE_MS = 3000;
+const unsigned long PANEL_INTERVALO_MS = 250;
 
 const int SERVO_STOP_US = 1500;
 const int SERVO_LEFT_FORWARD_US = 1700;
@@ -35,6 +36,14 @@ struct LecturaLinea {
 int pulsoServoLeft = SERVO_STOP_US;
 int pulsoServoRight = SERVO_STOP_US;
 unsigned long ultimoPulsoServo = 0;
+unsigned long ultimoEstadoPanel = 0;
+LecturaLinea ultimaLinea = {false, false, false};
+long ultimaDistanciaCm = -1;
+bool ultimoOponenteDetectado = false;
+const char* estadoPanel = "INIT";
+const char* motorLeftPanel = "DETENIDO";
+const char* motorRightPanel = "DETENIDO";
+const char* buzzerPanel = "OFF";
 
 void configurarPines();
 long leerUltrasonico();
@@ -56,6 +65,7 @@ void procesarComandoSerial();
 void actualizarServos();
 void emitirPulsoServo(byte pin, int anchoUs);
 void setServos(int leftUs, int rightUs);
+void publicarEstadoPanel();
 
 void setup() {
   Serial.begin(9600);
@@ -67,8 +77,13 @@ void setup() {
   Serial.println("Robot Minisumo - Pinout real: TCRT L/R/B D3/D2/D0");
   Serial.println("Prototipo fisico funcional: SG90 D9/D10 y sensores finales confirmados.");
   Serial.println("Advertencia: TCRT Back usa D0/RX; desconectar para cargar firmware si es necesario.");
+  estadoPanel = "START_WAIT";
+  ultimaLinea = leerSensoresLinea();
+  publicarEstadoPanel();
   sonarBuzzer(120);
   delay(TIEMPO_ARRANQUE_MS);
+  estadoPanel = "BUSCAR";
+  publicarEstadoPanel();
   sonarBuzzer(80);
 }
 
@@ -76,18 +91,29 @@ void loop() {
   actualizarServos();
   procesarComandoSerial();
 
+  estadoPanel = "READ_LINE";
   LecturaLinea linea = leerSensoresLinea();
+  ultimaLinea = linea;
+  publicarEstadoPanel();
   if (linea.left || linea.right || linea.back) {
+    estadoPanel = "EVITAR_BORDE";
+    publicarEstadoPanel();
     evitarBorde();
+    publicarEstadoPanel();
     return;
   }
 
+  estadoPanel = "READ_ULTRA";
   long distancia = leerUltrasonico();
-  if (distancia > 0 && distancia <= DISTANCIA_ATAQUE_CM) {
+  ultimaDistanciaCm = distancia;
+  ultimoOponenteDetectado = distancia > 0 && distancia <= DISTANCIA_ATAQUE_CM;
+  publicarEstadoPanel();
+  if (ultimoOponenteDetectado) {
     atacar();
   } else {
     buscarOponente();
   }
+  publicarEstadoPanel();
 }
 
 void configurarPines() {
@@ -131,55 +157,87 @@ bool leerLineaDigital(byte pin) {
 
 void avanzar() {
   setServos(SERVO_LEFT_FORWARD_US, SERVO_RIGHT_FORWARD_US);
+  motorLeftPanel = "AVANZAR";
+  motorRightPanel = "AVANZAR";
 }
 
 void retroceder() {
   setServos(SERVO_LEFT_REVERSE_US, SERVO_RIGHT_REVERSE_US);
+  motorLeftPanel = "RETROCEDER";
+  motorRightPanel = "RETROCEDER";
 }
 
 void girarIzquierda() {
   setServos(SERVO_LEFT_REVERSE_US, SERVO_RIGHT_FORWARD_US);
+  motorLeftPanel = "RETROCEDER";
+  motorRightPanel = "AVANZAR";
 }
 
 void girarDerecha() {
   setServos(SERVO_LEFT_FORWARD_US, SERVO_RIGHT_REVERSE_US);
+  motorLeftPanel = "AVANZAR";
+  motorRightPanel = "RETROCEDER";
 }
 
 void detenerRobot() {
   setServos(SERVO_STOP_US, SERVO_STOP_US);
+  motorLeftPanel = "DETENIDO";
+  motorRightPanel = "DETENIDO";
 }
 
 void buscarOponente() {
+  estadoPanel = "BUSCAR";
   girarDerecha();
+  publicarEstadoPanel();
   delay(80);
 }
 
 void atacar() {
+  estadoPanel = "ATACAR";
   avanzar();
+  motorLeftPanel = "ATAQUE";
+  motorRightPanel = "ATAQUE";
+  publicarEstadoPanel();
   sonarBuzzer(25);
   delay(120);
 }
 
 void evitarBorde() {
+  estadoPanel = "EVITAR_BORDE";
   LecturaLinea linea = leerSensoresLinea();
+  ultimaLinea = linea;
   sonarBuzzer(120);
+  estadoPanel = "RETROCEDER";
   retroceder();
+  publicarEstadoPanel();
   delay(350);
   if (linea.left && !linea.right) {
+    estadoPanel = "GIRO_DERECHO";
     girarDerecha();
   } else if (linea.right && !linea.left) {
+    estadoPanel = "GIRO_IZQUIERDO";
     girarIzquierda();
   } else {
+    estadoPanel = "GIRO_DERECHO";
     girarDerecha();
   }
+  publicarEstadoPanel();
   delay(linea.back ? 500 : 350);
+  estadoPanel = "DETENER";
   detenerRobot();
+  publicarEstadoPanel();
 }
 
 void sonarBuzzer(unsigned int duracionMs) {
+  buzzerPanel = "ON";
   digitalWrite(PIN_BUZZER, HIGH);
+  ultimoEstadoPanel = 0;
+  publicarEstadoPanel();
   delay(duracionMs);
   digitalWrite(PIN_BUZZER, LOW);
+  buzzerPanel = "OFF";
+  ultimoEstadoPanel = 0;
+  publicarEstadoPanel();
 }
 
 void sonarBuzzer() {
@@ -189,6 +247,9 @@ void sonarBuzzer() {
 void pruebaSensores() {
   long distancia = leerUltrasonico();
   LecturaLinea linea = leerSensoresLinea();
+  ultimaDistanciaCm = distancia;
+  ultimaLinea = linea;
+  ultimoOponenteDetectado = distancia > 0 && distancia <= DISTANCIA_ATAQUE_CM;
   Serial.print("Distancia=");
   Serial.print(distancia);
   Serial.print(" L=");
@@ -197,6 +258,8 @@ void pruebaSensores() {
   Serial.print(linea.right);
   Serial.print(" B=");
   Serial.println(linea.back);
+  ultimoEstadoPanel = 0;
+  publicarEstadoPanel();
 }
 
 void pruebaServos() {
@@ -214,10 +277,10 @@ void procesarComandoSerial() {
   char comando = Serial.read();
   switch (comando) {
     case 's': pruebaSensores(); break;
-    case 'v': pruebaServos(); break;
-    case 'b': sonarBuzzer(); break;
-    case 'a': avanzar(); delay(500); detenerRobot(); break;
-    case 'd': detenerRobot(); break;
+    case 'v': estadoPanel = "INIT"; pruebaServos(); publicarEstadoPanel(); break;
+    case 'b': estadoPanel = "BUZZER"; sonarBuzzer(); break;
+    case 'a': estadoPanel = "ATACAR"; avanzar(); publicarEstadoPanel(); delay(500); detenerRobot(); break;
+    case 'd': estadoPanel = "DETENER"; detenerRobot(); publicarEstadoPanel(); break;
     default: break;
   }
 }
@@ -238,5 +301,30 @@ void emitirPulsoServo(byte pin, int anchoUs) {
   digitalWrite(pin, HIGH);
   delayMicroseconds(anchoUs);
   digitalWrite(pin, LOW);
+}
+
+void publicarEstadoPanel() {
+  unsigned long ahora = millis();
+  if (ultimoEstadoPanel != 0 && ahora - ultimoEstadoPanel < PANEL_INTERVALO_MS) return;
+  ultimoEstadoPanel = ahora;
+
+  Serial.print("STATE:");
+  Serial.println(estadoPanel);
+  Serial.print("TCRT_LEFT:");
+  Serial.println(ultimaLinea.left ? 1 : 0);
+  Serial.print("TCRT_RIGHT:");
+  Serial.println(ultimaLinea.right ? 1 : 0);
+  Serial.print("TCRT_BACK:");
+  Serial.println(ultimaLinea.back ? 1 : 0);
+  Serial.print("DIST_CM:");
+  Serial.println(ultimaDistanciaCm);
+  Serial.print("OPONENTE:");
+  Serial.println(ultimoOponenteDetectado ? 1 : 0);
+  Serial.print("MOTOR_LEFT:");
+  Serial.println(motorLeftPanel);
+  Serial.print("MOTOR_RIGHT:");
+  Serial.println(motorRightPanel);
+  Serial.print("BUZZER:");
+  Serial.println(buzzerPanel);
 }
 

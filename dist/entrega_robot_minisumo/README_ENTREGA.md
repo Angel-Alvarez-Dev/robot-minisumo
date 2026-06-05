@@ -19,6 +19,7 @@ El prototipo fisico del Robot Minisumo fue probado y se encuentra funcional.
 - `simulation/`: casos de validacion logica.
 - `docs/`: BOM, conexiones, algoritmos, pseudocodigo y diagramas.
 - `validation/`: registros de pruebas, compilacion, KiCad y checklist final.
+- `web-control/`: panel web de monitoreo con modo demo y Web Serial opcional.
 - `assets/`: imagen final de conexiones y hojas Excel anexas.
 
 ## Nota sobre PDFs y KiCad

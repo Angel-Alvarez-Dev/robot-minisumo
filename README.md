@@ -75,13 +75,23 @@ Abrir `hardware/kicad/robot_minisumo.kicad_pro`. El esquematico representa el mo
 
 - BOM final: `docs/bom_final.md`.
 - Conexiones finales: `docs/lista_conexiones_final.md`.
+- Panel de monitoreo: `docs/panel_web_monitoreo.md`.
 - Algoritmos y pseudocodigo: `docs/algoritmos.md`, `docs/pseudocodigo.md`.
 - Validacion: `validation/` y `simulation/`.
 - Reporte academico: `report/`.
 
-## Herramienta web
+## Panel web de monitoreo
 
-Abrir `web-control/index.html` o servir el repositorio en `http://localhost:8080/web-control/`. Incluye panel visual, pinout, estado de sensores/actuadores y lectura Web Serial opcional para el firmware final.
+Abrir `web-control/index.html` o servir el repositorio en `http://localhost:8080/web-control/`.
+
+El panel esta disenado para grabar y explicar el robot en funcionamiento. Muestra procesos activos, accion actual, TCRT5000 Left/Right/Back, HC-SR04, servos SG90, buzzer KY-012, diagrama visual del robot y registro de eventos.
+
+Incluye:
+
+- Modo demo / grabacion con estados simulados desde el panel.
+- Conexion opcional por Web Serial API a 9600 baudios.
+- Parseo de mensajes `STATE`, `TCRT_LEFT`, `TCRT_RIGHT`, `TCRT_BACK`, `DIST_CM`, `OPONENTE`, `MOTOR_LEFT`, `MOTOR_RIGHT` y `BUZZER`.
+- Compatibilidad con la linea de prueba `Distancia=<cm> L=<0/1> R=<0/1> B=<0/1>`.
 
 ## Licencia
 

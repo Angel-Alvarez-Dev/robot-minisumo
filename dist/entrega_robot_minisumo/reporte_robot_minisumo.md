@@ -20,15 +20,16 @@
 8. Esquematicos del circuito.
 9. Funcionamiento del sistema.
 10. Codigo implementado.
-11. Algoritmos.
-12. Pseudocodigo.
-13. Diagramas de flujo.
-14. Simulacion y validacion.
-15. Pruebas realizadas.
-16. Resultados.
-17. Conclusiones.
-18. Referencias.
-19. Anexos.
+11. Panel de monitoreo para demostracion.
+12. Algoritmos.
+13. Pseudocodigo.
+14. Diagramas de flujo.
+15. Simulacion y validacion.
+16. Pruebas realizadas.
+17. Resultados.
+18. Conclusiones.
+19. Referencias.
+20. Anexos.
 
 ## 3. Introduccion
 
@@ -96,25 +97,63 @@ const byte PIN_SERVO_LEFT = 9;
 const byte PIN_SERVO_RIGHT = 10;
 ```
 
-Funciones principales: `configurarPines`, `leerUltrasonico`, `leerSensoresLinea`, `avanzar`, `retroceder`, `girarIzquierda`, `girarDerecha`, `detenerRobot`, `buscarOponente`, `atacar`, `evitarBorde`, `sonarBuzzer`, `pruebaSensores` y `pruebaServos`.
+Funciones principales: `configurarPines`, `leerUltrasonico`, `leerSensoresLinea`, `avanzar`, `retroceder`, `girarIzquierda`, `girarDerecha`, `detenerRobot`, `buscarOponente`, `atacar`, `evitarBorde`, `sonarBuzzer`, `pruebaSensores`, `pruebaServos` y `publicarEstadoPanel`.
 
-## 13. Algoritmos
+## 13. Panel de monitoreo para demostracion
+
+Se agrego un panel web de monitoreo en `web-control/` para apoyar la grabacion del robot funcionando. El objetivo del panel es mostrar de forma clara y visual lo que ocurre durante la operacion del Robot Minisumo, de modo que los procesos internos puedan explicarse en video mientras el prototipo se mueve o mientras se simulan estados controlados.
+
+Componentes monitoreados:
+
+- HC-SR04 ultrasonico.
+- TCRT5000 Left, Right y Back.
+- Servo/Motor izquierdo SG90.
+- Servo/Motor derecho SG90.
+- Buzzer KY-012.
+- Arduino Nano.
+- Arduino Nano Expansion I/O Shield.
+- Alimentacion y GND comun.
+
+Procesos mostrados:
+
+- Inicializacion.
+- Espera de arranque.
+- Lectura de sensores de linea.
+- Lectura de sensor ultrasonico.
+- Busqueda de oponente.
+- Ataque.
+- Evasion de borde.
+- Retroceso.
+- Giro izquierdo.
+- Giro derecho.
+- Detencion.
+- Buzzer activo.
+
+El panel incluye modo demo / grabacion. En este modo los estados son simulados desde el panel y se indica claramente al usuario que no corresponden a lecturas reales del Arduino. Esto permite preparar tomas de video donde se expliquen casos concretos como borde izquierdo, borde derecho, borde trasero, oponente cerca, ataque, busqueda, retroceso, giros, buzzer y detencion.
+
+Tambien se implemento integracion opcional con Web Serial API. Si el navegador soporta Web Serial, el boton `Conectar Arduino` permite seleccionar el puerto del Arduino a 9600 baudios. El firmware final publica mensajes como `STATE:BUSCAR`, `STATE:ATACAR`, `TCRT_LEFT:1`, `DIST_CM:20`, `MOTOR_LEFT:AVANZAR` y `BUZZER:ON`. El panel parsea esos mensajes y actualiza sensores, actuadores, procesos y registro de eventos.
+
+Descripcion visual del panel: en la parte superior se muestra accion actual, conexion, distancia y firmware detectado. A la izquierda aparece una lista de procesos con estados inactivo, activo, completado o alerta. Al centro se muestra un diagrama vivo del robot con Arduino Nano, Shield, sensores, motores, buzzer y alimentacion/GND comun. Debajo aparecen tarjetas para HC-SR04, TCRT5000, servos/motores y buzzer, junto con controles de modo demo y registro de eventos.
+
+La utilidad principal durante la grabacion es que el panel permite explicar que sensor se activo, que accion tomo el robot y que proceso interno esta en curso, incluso cuando el movimiento fisico ocurre rapido o cuando se necesita repetir un caso para la camara.
+
+## 14. Algoritmos
 
 Ver `docs/algoritmos.md`.
 
-## 14. Pseudocodigo
+## 15. Pseudocodigo
 
 Ver `docs/pseudocodigo.md`.
 
-## 15. Diagramas de flujo
+## 16. Diagramas de flujo
 
 Ver `docs/diagramas_flujo.md`.
 
-## 16. Simulacion y validacion
+## 17. Simulacion y validacion
 
 Ver `simulation/casos_prueba.md`, `simulation/validacion_logica.md` y `validation/registro_pruebas.md`.
 
-## 17. Pruebas realizadas
+## 18. Pruebas realizadas
 
 | Prueba | Resultado esperado | Resultado observado | Estado |
 | --- | --- | --- | --- |
@@ -126,9 +165,10 @@ Ver `simulation/casos_prueba.md`, `simulation/validacion_logica.md` y `validatio
 | Servo D9 aislado | Movimiento adelante y atras | 1700 us adelanta y 1300 us atrasa | Aprobado |
 | Servos D9/D10 conjunto | D9 avanza y D10 acompana sin quedarse quieto | D9 avanza, D10 acompana invertido por montaje, ninguno se queda quieto | Aprobado |
 | Firmware final | Arranque serial y logica cargada | Firmware final cargado en COM8 y arranque serial observado | Aprobado |
+| Panel web de monitoreo | Mostrar procesos, sensores, motores, buzzer y eventos | Panel actualizado con modo demo y Web Serial opcional | Aprobado |
 | Robot fisico | Prototipo opera con sensores y actuadores finales | Estado reportado por usuario: robot fisico funcional | Aprobado |
 
-## 18. Resultados
+## 19. Resultados
 
 El prototipo fisico quedo funcional. Se confirmaron buzzer, HC-SR04, tres TCRT5000 y servos SG90. El pinout final real quedo documentado y el firmware final se cargo en COM8.
 
@@ -140,18 +180,18 @@ Robot Minisumo Final
 FUNCIONAL_PROBADO
 ```
 
-## 19. Conclusiones
+## 20. Conclusiones
 
 El proyecto final integra hardware, firmware y documentacion de forma coherente con el robot funcional real. La principal restriccion tecnica es el uso de D0 para el sensor trasero, debido a que comparte RX Serial. La recomendacion es desconectar temporalmente ese sensor durante cargas de firmware o futuras depuraciones seriales.
 
-## 20. Referencias
+## 21. Referencias
 
 - Documentacion Arduino Nano.
 - Hojas tecnicas HC-SR04, TCRT5000, SG90 y KY-012.
 - Documentacion KiCad.
 - BOM y lista final de conexiones anexadas al proyecto.
 
-## 21. Anexos
+## 22. Anexos
 
 - `firmware/`.
 - `hardware/kicad/`.
